@@ -54,7 +54,7 @@ android {
     defaultConfig {
         signingConfig signingConfigs.debug
         applicationId 'com.qualcomm.ftcrobotcontroller'
-        minSdkVersion 23
+        minSdkVersion 24  // LK was 23
         //noinspection ExpiredTargetSdkVersion
         targetSdkVersion 28
 
@@ -117,6 +117,10 @@ android {
     sourceSets.main {
         jni.srcDirs = []
         jniLibs.srcDir rootProject.file('libs')
+        java {
+            //exclude 'TeamCode/src/main/java/Ignore'   //lk
+            exclude '**/Ignore'   //lk
+        }
     }
     ndkVersion '21.3.6528147'
 }
