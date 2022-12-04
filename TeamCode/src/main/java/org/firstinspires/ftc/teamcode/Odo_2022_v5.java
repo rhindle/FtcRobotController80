@@ -63,6 +63,8 @@ public class Odo_2022_v5 extends LinearOpMode {
     private ElapsedTime navTime = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
     int lastStep = 0;
 
+    public LKController lkController;
+
     // type, x, y, rot
     // where type 1 = accurate, 2 = transition, 3 = pause..., 4 = (not used yet), 999 = end routine
     double[][] autoScript = {
@@ -91,6 +93,8 @@ public class Odo_2022_v5 extends LinearOpMode {
     @Override
     public void runOpMode() {
         imu = hardwareMap.get(BNO055IMU.class, "imu");
+
+        lkController = new LKController(this);
 
         // Important Step 1:  Make sure you use DcMotorEx when you instantiate your motors.
         motor0 = hardwareMap.get(DcMotorEx.class, "motor0");  // Configure the robot to use these 4 motor names,
@@ -407,6 +411,10 @@ public class Odo_2022_v5 extends LinearOpMode {
     // Interpret user control inputs
     private void Controls() {
 
+        if (lkController.isPressed(1, LKController.GPbuttons.BACK)) {
+            telemetry.addData("BACK PRESSED", 0);
+        };
+
         // This blob is for manually entering desitnations
         if (gamepad2.a) {
             targetX = Math.round(xPos);
@@ -489,6 +497,8 @@ public class Odo_2022_v5 extends LinearOpMode {
             navStep=0;
             navTime.reset();
         }
+
+        // ???? if (gamepad1
 
         // Get speed and direction from left stick
         DriveSpeed = JavaUtil.minOfList(JavaUtil.createListWith(1, math_hypot(gamepad1.left_stick_x, gamepad1.left_stick_y)));
