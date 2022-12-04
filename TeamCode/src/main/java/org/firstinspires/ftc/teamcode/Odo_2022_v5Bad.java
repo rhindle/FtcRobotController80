@@ -15,12 +15,11 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
-import java.lang.reflect.Field;
 import java.util.List;
 
-@TeleOp(name = "3Odo_2022_v5", group = "")
+@TeleOp(name = "3Odo_2022_v5Bad", group = "")
 //@Disabled
-public class Odo_2022_v5 extends LinearOpMode {
+public class Odo_2022_v5Bad extends LinearOpMode {
 
     private BNO055IMU imu;
 
@@ -48,7 +47,7 @@ public class Odo_2022_v5 extends LinearOpMode {
     private double deltaHeading = 0;
     private int toggleRotate;
 
-    private boolean last_left, last_right, last_up, last_down, last_x, last_y;
+    //private boolean last_left, last_right, last_up, last_down, last_x, last_y;
 
     private final double maxSpeed = 1;//0.2;
 
@@ -63,7 +62,10 @@ public class Odo_2022_v5 extends LinearOpMode {
     private ElapsedTime navTime = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
     int lastStep = 0;
 
-    public LKController lkController;
+    public LKControllerBad lkController;
+    //DELETE THIS CRAP
+    private int countTap = 0;
+    private int countRelease = 0;
 
     // type, x, y, rot
     // where type 1 = accurate, 2 = transition, 3 = pause..., 4 = (not used yet), 999 = end routine
@@ -94,7 +96,7 @@ public class Odo_2022_v5 extends LinearOpMode {
     public void runOpMode() {
         imu = hardwareMap.get(BNO055IMU.class, "imu");
 
-        lkController = new LKController(this);
+        lkController = new LKControllerBad(this);
 
         // Important Step 1:  Make sure you use DcMotorEx when you instantiate your motors.
         motor0 = hardwareMap.get(DcMotorEx.class, "motor0");  // Configure the robot to use these 4 motor names,
@@ -170,11 +172,11 @@ public class Odo_2022_v5 extends LinearOpMode {
                 }
 
 
-//                // set motor power
-//                motor0.setPower(v0);
-//                motor2.setPower(v1);
-//                motor1.setPower(v2);
-//                motor3.setPower(v3);
+                // set motor power
+                motor0.setPower(v0);
+                motor2.setPower(v1);
+                motor1.setPower(v2);
+                motor3.setPower(v3);
 
                 addTelemetryLoopEnd();
 
@@ -413,13 +415,24 @@ public class Odo_2022_v5 extends LinearOpMode {
 
         lkController.updateAll();
 
-        telemetry.addData("LOOP---", 0);
-
-        if (lkController.isPressed(1, LKController.GPbuttons.BACK)) {
-            telemetry.addData("BACK PRESSED", 0);
+        //if (lkController.isPressed(1, LKControllerBad.GPbuttons.BACK)) {
+        //    telemetry.addData("BACK IS PRESSED", 0);
+        //};
+        telemetry.addData("BACK PRESSED",lkController.isPressed(1, LKControllerBad.GPbuttons.BACK));
+        if (lkController.wasTapped(1, LKControllerBad.GPbuttons.BACK)) {
+            countTap++;
         };
+        //if (lkController.isHeld(1, LKControllerBad.GPbuttons.BACK)) {
+        //    telemetry.addData("BACK HELD", 0);
+        //};
+        telemetry.addData("BACK HELD",lkController.isHeld(1, LKControllerBad.GPbuttons.BACK));
+        if (lkController.wasReleased(1, LKControllerBad.GPbuttons.BACK)) {
+            countRelease++;
+        };
+        telemetry.addData("BACK TAP COUNT", countTap);
+        telemetry.addData("BACK REL COUNT", countRelease);
 
-        // This blob is for manually entering desitnations
+        // This blob is for manually entering destinations
         if (gamepad2.a) {
             targetX = Math.round(xPos);
             targetY = Math.round(yPos);
@@ -432,7 +445,7 @@ public class Odo_2022_v5 extends LinearOpMode {
         //if (gamepad2.x) targetRot++;
         //if (gamepad2.y) targetRot--;
 
-        if (!gamepad2.dpad_up) {
+        /*if (!gamepad2.dpad_up) {
             last_up = false;
         }
         else if (!last_up) {
@@ -478,6 +491,25 @@ public class Odo_2022_v5 extends LinearOpMode {
         else if (!last_y) {
             targetRot = targetRot - (gamepad2.back ? 2 : 45);
             last_y = true;
+        } */
+
+        if (lkController.wasTapped(2, LKControllerBad.GPbuttons.dpadUP)) {
+            targetX = targetX + (gamepad2.back ? 1 : 11.75);
+        }
+        if (lkController.wasTapped(2, LKControllerBad.GPbuttons.dpadDOWN)) {
+            targetX = targetX - (gamepad2.back ? 1 : 11.75);
+        }
+        if (lkController.wasTapped(2, LKControllerBad.GPbuttons.dpadLEFT)) {
+            targetY = targetY + (gamepad2.back ? 1 : 11.75);
+        }
+        if (lkController.wasTapped(2, LKControllerBad.GPbuttons.dpadRIGHT)) {
+            targetY = targetY - (gamepad2.back ? 1 : 11.75);
+        }
+        if (lkController.wasTapped(2, LKControllerBad.GPbuttons.X)) {
+            targetRot = targetRot + (gamepad2.back ? 2 : 45);
+        }
+        if (lkController.wasTapped(2, LKControllerBad.GPbuttons.Y)) {
+            targetRot = targetRot - (gamepad2.back ? 2 : 45);
         }
 
         if (gamepad2.start) navigate=1;

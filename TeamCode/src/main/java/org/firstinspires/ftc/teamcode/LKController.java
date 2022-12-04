@@ -19,7 +19,7 @@ public class LKController {
     //public Canvas field;
     //public boolean autoBlue = true;
 
-    public Object[] controlList = {};
+    public Object[] controlList = {};  //Object
     public ControlData[] controlData;
 
     ////////////////
@@ -37,7 +37,7 @@ public class LKController {
         this.gamepad2 = opMode.gamepad2;
         this.telemetry = opMode.telemetry;
 
-        controlList = new Object[]{
+        controlList = new Object[]{   // Object
                 gamepad1.dpad_up,
                 gamepad1.dpad_down,
                 gamepad1.dpad_left,
@@ -134,7 +134,7 @@ public class LKController {
     }
 
     class ControlData {
-        Object source;
+        Object source;  //object
         boolean lastStatus;
         long lastTime;
         boolean tapped;
@@ -144,7 +144,7 @@ public class LKController {
         boolean released;
 
         public void setData(Object source, boolean last, long lastTime, boolean tapped, boolean doubleTapped, boolean held, boolean pressed, boolean released)
-        {
+        {  //object
             this.source = source;
             this.lastStatus = last;
             this.lastTime = lastTime;
@@ -155,7 +155,7 @@ public class LKController {
             this.released = released;
         }
 
-        public void initData(Object source)
+        public void initData(Object source)  //object
         {
             this.source = source;
             lastStatus = false;
