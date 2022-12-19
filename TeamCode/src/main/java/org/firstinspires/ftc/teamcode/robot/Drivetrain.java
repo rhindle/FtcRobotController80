@@ -10,9 +10,9 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 public class Drivetrain {
 
     LinearOpMode opMode;
-    HardwareMap hardwareMap;
-    Gamepad gamepad1;
-    Gamepad gamepad2;
+//    HardwareMap hardwareMap;
+//    Gamepad gamepad1;
+//    Gamepad gamepad2;
     Telemetry telemetry;
     Robot robot;
 
@@ -25,9 +25,9 @@ public class Drivetrain {
 
     void construct(LinearOpMode opMode, Robot robot){
         this.opMode = opMode;
-        this.hardwareMap = opMode.hardwareMap;
-        this.gamepad1 = opMode.gamepad1;
-        this.gamepad2 = opMode.gamepad2;
+//        this.hardwareMap = opMode.hardwareMap;
+//        this.gamepad1 = opMode.gamepad1;
+//        this.gamepad2 = opMode.gamepad2;
         this.telemetry = opMode.telemetry;
         this.robot = robot;
     }

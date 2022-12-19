@@ -1,8 +1,6 @@
 package org.firstinspires.ftc.teamcode.robot;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.Gamepad;
-import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.JavaUtil;
@@ -11,9 +9,9 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 public class Navigator {
 
    LinearOpMode opMode;
-   HardwareMap hardwareMap;
-   Gamepad gamepad1;
-   Gamepad gamepad2;
+//   HardwareMap hardwareMap;
+//   Gamepad gamepad1;
+//   Gamepad gamepad2;
    Telemetry telemetry;
    Robot robot;
    Localizer localizer;
@@ -22,8 +20,11 @@ public class Navigator {
    public double v0, v2, v1, v3;
    double driveSpeed, driveAngle, rotate;
    double maxSpeed = 1;
-   private double storedHeading = 0;
-   private double deltaHeading = 0;
+   public double storedHeading = 0;
+   public double deltaHeading = 0;
+   boolean useFieldCentricDrive = true;
+   boolean useHeadingHold = true;
+   long headingDelay = System.currentTimeMillis();
 
    public double targetX, targetY, targetRot;
    public int navigate = 0;
@@ -39,9 +40,9 @@ public class Navigator {
 
    void construct(LinearOpMode opMode, Robot robot, Localizer localizer, Drivetrain drivetrain){
       this.opMode = opMode;
-      this.hardwareMap = opMode.hardwareMap;
-      this.gamepad1 = opMode.gamepad1;
-      this.gamepad2 = opMode.gamepad2;
+//      this.hardwareMap = opMode.hardwareMap;
+//      this.gamepad1 = opMode.gamepad1;
+//      this.gamepad2 = opMode.gamepad2;
       this.telemetry = opMode.telemetry;
       this.robot = robot;
       this.localizer = localizer;
@@ -53,75 +54,44 @@ public class Navigator {
       v1 = 0.0;
       v2 = 0.0;
       v3 = 0.0;
+      storedHeading = localizer.returnGlobalHeading();
    }
 
    public void loop() {
+
+      // State machine-ish.  Needs embetterment.  This will determine motor powers then set them
       if (navigate == 1) {
          autoDrive();
       }
       else if (navigate == 2) {
-         scriptedNav2();
+         scriptedNavigation();
       }
       else {
-         //userDrive(DriveSpeed, DriveAngle, Rotate);
          userDrive();
       }
 
-      // set motor power
       drivetrain.setDrivePowers(v0, v1, v2, v3);
    }
 
-   public enum Actions {
-      MOVEACCURATE,
-      MOVETRANSITION,
-      PAUSE,
-      ENDROUTINE
-   }
-
-   public class NavActions {
-      Actions action;
-      double parameter1;
-      double parameter2;
-      double parameter3;
-
-      public NavActions(Actions a, double x, double y, double r) {
-         action = a;
-         parameter1 = x;
-         parameter2 = y;
-         parameter3 = r;
-      }
-      public NavActions(Actions a) {
-         action = a;
-         parameter1 = 0;
-         parameter2 = 0;
-         parameter3 = 0;
-      }
-      public NavActions(Actions a, double p) {
-         action = a;
-         parameter1 = p;
-         parameter2 = 0;
-         parameter3 = 0;
-      }
-   }
 
    // type, x, y, rot
-   NavActions[] autoScript2 =  new NavActions[]{
-           new NavActions(Actions.MOVEACCURATE, 0, 0, 0),
-           new NavActions(Actions.MOVEACCURATE, 24, -20, -90),
-           new NavActions(Actions.PAUSE,500),
-           new NavActions(Actions.MOVETRANSITION,24, 0, 90),
-           new NavActions(Actions.MOVETRANSITION,48, 0, 90),
-           new NavActions(Actions.MOVEACCURATE,48, 24, 90),
-           new NavActions(Actions.PAUSE,1000),
-           new NavActions(Actions.MOVETRANSITION,48, 4, 90),
-           new NavActions(Actions.MOVEACCURATE,24, 0, 0),
-           new NavActions(Actions.PAUSE,1000),
-           new NavActions(Actions.MOVEACCURATE,0,0,0),
-           new NavActions(Actions.ENDROUTINE),
+   NavActions[] autoScript2 =  new NavActions[] {
+      new NavActions(Actions.MOVEACCURATE, 0, 0, 0),
+      new NavActions(Actions.MOVEACCURATE, 24, -20, -90),
+      new NavActions(Actions.PAUSE,500),
+      new NavActions(Actions.MOVETRANSITION,24, 0, 90),
+      new NavActions(Actions.MOVETRANSITION,48, 0, 90),
+      new NavActions(Actions.MOVEACCURATE,48, 24, 90),
+      new NavActions(Actions.PAUSE,1000),
+      new NavActions(Actions.MOVETRANSITION,48, 4, 90),
+      new NavActions(Actions.MOVEACCURATE,24, 0, 0),
+      new NavActions(Actions.PAUSE,1000),
+      new NavActions(Actions.MOVEACCURATE,0,0,0),
+      new NavActions(Actions.ENDROUTINE),
    };
 
    // Simple state machine for scripted navigation actions
-   public void scriptedNav2() {
+   public void scriptedNavigation() {
 
       // reset the timer each new step (could be used to time out actions;
       // is used for delays)
@@ -133,7 +103,6 @@ public class Navigator {
       Actions currentAction = autoScript2[navStep].action;
 
       telemetry.addData("NavStep", navStep);
-      //telemetry.addData("Action", autoScript[navStep]);
 
       // accurate position
       if (currentAction == Actions.MOVEACCURATE) {
@@ -164,10 +133,10 @@ public class Navigator {
    // Determine motor speeds when under automatic control
    public void autoDrive () {
       double distance, deltaX, deltaY, deltaRot, pDist, pRot, navAngle;
-      v0 = 0.0;
-      v2 = 0.0;
-      v1 = 0.0;
-      v3 = 0.0;
+//      v0 = 0.0;
+//      v2 = 0.0;
+//      v1 = 0.0;
+//      v3 = 0.0;
       deltaX = targetX - localizer.xPos;  // error in x
       deltaY = targetY - localizer.yPos;  // error in y
       telemetry.addData("DeltaX", JavaUtil.formatNumber(deltaX, 2));
@@ -244,7 +213,6 @@ public class Navigator {
    // Get heading error
    public double getError(double targetAngle) {
       double robotError;
-
       // calculate error in -179 to +180 range  (
       //robotError = targetAngle - getHeading();
       robotError = targetAngle - robot.returnImuHeading();
@@ -284,6 +252,19 @@ public class Navigator {
       targetRot = Math.round(localizer.returnGlobalHeading());
    }
 
+   public void setDeltaHeading() {
+      deltaHeading = storedHeading;
+   }
+
+   public void toggleFieldCentricDrive() {
+      useFieldCentricDrive = !useFieldCentricDrive;
+   }
+
+   public void toggleHeadingHold() {
+      useHeadingHold = !useHeadingHold;
+      storedHeading = localizer.returnGlobalHeading();
+   }
+
    public void setTargetByDelta(double X, double Y, double R) {
       targetX += X;
       targetY += Y;
@@ -294,5 +275,61 @@ public class Navigator {
       this.driveSpeed = driveSpeed;
       this.driveAngle = driveAngle;
       this.rotate = rotate;
+      // Modify for field centric Drive
+      if (useFieldCentricDrive) {
+         this.driveAngle = driveAngle - storedHeading + deltaHeading;
+      }
+      // Modify for Hold Angle
+      if (useHeadingHold) {
+         // Correct the heading if not currently being controlled
+         if (headingDelay <= System.currentTimeMillis()) {  // shouldn't need to check if == 0
+            this.rotate = getError(storedHeading) / -15 * (driveSpeed + 0.2);   // base this on speed?
+         }
+      }
    }
+
+   public void handleRotate(double rotate) {
+      // overall plan here is to deal with IMU latency
+      if (rotate != 0) {
+         storedHeading = localizer.returnGlobalHeading();
+         headingDelay = System.currentTimeMillis() + 250;  // going to ignore the possibility of overflow
+      } else if (headingDelay > System.currentTimeMillis()) {
+         // keep re-reading until delay has passed
+         storedHeading = localizer.returnGlobalHeading();
+      }
+   }
+
+   public enum Actions {
+      MOVEACCURATE,
+      MOVETRANSITION,
+      PAUSE,
+      ENDROUTINE
+   }
+
+   public class NavActions {
+      Actions action;
+      double parameter1;
+      double parameter2;
+      double parameter3;
+
+      public NavActions(Actions a, double x, double y, double r) {
+         action = a;
+         parameter1 = x;
+         parameter2 = y;
+         parameter3 = r;
+      }
+      public NavActions(Actions a) {
+         action = a;
+         parameter1 = 0;
+         parameter2 = 0;
+         parameter3 = 0;
+      }
+      public NavActions(Actions a, double p) {
+         action = a;
+         parameter1 = p;
+         parameter2 = 0;
+         parameter3 = 0;
+      }
+   }
+
 }

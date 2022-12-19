@@ -84,8 +84,8 @@ public class Robot {
 
     LinearOpMode opMode;
     HardwareMap hardwareMap;
-    Gamepad gamepad1;
-    Gamepad gamepad2;
+//    Gamepad gamepad1;
+//    Gamepad gamepad2;
     Telemetry telemetry;
 
     Orientation angles;
@@ -99,8 +99,8 @@ public class Robot {
     void construct(LinearOpMode opMode){
         this.opMode = opMode;
         this.hardwareMap = opMode.hardwareMap;
-        this.gamepad1 = opMode.gamepad1;
-        this.gamepad2 = opMode.gamepad2;
+//        this.gamepad1 = opMode.gamepad1;
+//        this.gamepad2 = opMode.gamepad2;
         this.telemetry = opMode.telemetry;
 
         // Bulk Reads - Important Step 2: Get access to a list of Expansion Hub Modules to enable changing caching methods.

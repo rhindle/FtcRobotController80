@@ -9,7 +9,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 public class ButtonMgr {
 
     public LinearOpMode opMode;
-    public HardwareMap hardwareMap;
+//    public HardwareMap hardwareMap;
     public Gamepad gamepad1;
     public Gamepad gamepad2;
     private Telemetry telemetry;
@@ -26,7 +26,7 @@ public class ButtonMgr {
 
     void construct(LinearOpMode opMode){
         this.opMode = opMode;
-        this.hardwareMap = opMode.hardwareMap;
+//        this.hardwareMap = opMode.hardwareMap;
         this.gamepad1 = opMode.gamepad1;
         this.gamepad2 = opMode.gamepad2;
         this.telemetry = opMode.telemetry;
@@ -39,6 +39,10 @@ public class ButtonMgr {
             controlData[i].initData(i);
         }
 
+    }
+
+    public void loop() {
+        updateAll();
     }
 
     public void updateAll()
