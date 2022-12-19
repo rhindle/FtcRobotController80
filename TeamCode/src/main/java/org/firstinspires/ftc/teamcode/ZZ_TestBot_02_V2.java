@@ -65,7 +65,7 @@ public class ZZ_TestBot_02_V2 extends LinearOpMode {
         // Wait for the game to start (Display Gyro value), and reset gyro before we move..
         while (!isStarted()) {
             //angles = robot.sensorIMU.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
-            telemetry.addData(">", "Robot Heading = %.1f", robot.imuHeading(true));
+            telemetry.addData(">", "Robot Heading = %.1f", robot.returnImuHeading(true));
             telemetry.update();
             sleep(100);
         }
@@ -242,7 +242,7 @@ public class ZZ_TestBot_02_V2 extends LinearOpMode {
                         " | 5 : " + (robot.digital5.getState() ? "T" : "F") +
                         " | 6 : " + (robot.digital6.getState() ? "T" : "F") +
                         " | 7 : " + (robot.digital7.getState() ? "T" : "F"));
-            telemetry.addData("Heading", "%.1f", robot.imuHeading());
+            telemetry.addData("Heading", "%.1f", robot.returnImuHeading());
             //telemetry.addData("Counter", counter);
             //telemetry.addData("LoopSpeed","%.1f",calcLoopSpeed());
             telemetry.addData("LoopTime(ms)","%.1f",loopElapsedTime.milliseconds());

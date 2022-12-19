@@ -17,11 +17,12 @@ public class Localizer {
    Robot robot;
 
    DcMotorEx odoXL, odoY, odoXR;
-   long encoderY, encoderXL, encoderXR;
+   public long encoderY, encoderXL, encoderXR;
    long encoderY0, encoderXL0, encoderXR0;
    double odoHeading, odoHeading0;
-   double globalHeading, globalHeading0;
-   double yPos, xPos;
+   double imuHeading, imuHeading0;
+   public double globalHeading, globalHeading0;
+   public double yPos, xPos;
 
    private static double eTicksPerInch = 82300 / 48;
    private static double eTicksPerRotate = 171500; //171738.8; //170000;
@@ -45,8 +46,9 @@ public class Localizer {
       encoderXL = odoXL.getCurrentPosition();
       encoderXR = odoXR.getCurrentPosition();
 
-      globalHeading = robot.imuHeading();
+      imuHeading = robot.returnImuHeading();
       odoHeading = getOdoHeading();
+      globalHeading = imuHeading;
 
       updateXY();
    }
@@ -66,8 +68,10 @@ public class Localizer {
       encoderY0 = odoY.getCurrentPosition();
       encoderXL0 = odoXL.getCurrentPosition();
       encoderXR0 = odoXR.getCurrentPosition();
-      globalHeading0 = robot.imuHeading(true);
+      imuHeading0 = robot.returnImuHeading(true);
       odoHeading0 = getOdoHeading();
+
+      globalHeading0 = imuHeading0;
    }
 
    // get heading from the odometry; accuracy varies :-(
@@ -81,6 +85,13 @@ public class Localizer {
       return diffX;
    }
 
+   public double returnOdoHeading() {
+      return odoHeading;
+   }
+
+   public double returnGlobalHeading() {
+      return globalHeading;
+   }
    // Get XY position data from odometry wheels
    private void updateXY () {
       double deltaEncX, deltaEncY, avgHeading;
@@ -93,7 +104,7 @@ public class Localizer {
       //myHeading = globalHeading;
       // Future - figure out average heading.  Challenge is the wrap.  Maybe use getError, /2, add to heading???
       //myHeading = getAvgHeading(odoHeading0,odoHeading);
-      myHeading = getAvgHeading(globalHeading0,globalHeading);
+      myHeading = getAvgHeading(imuHeading0, imuHeading);
 
       telemetry.addData ("My Average Heading", myHeading);
 
@@ -106,7 +117,7 @@ public class Localizer {
       encoderXL0 = encoderXL;
       encoderY0 = encoderY;
       encoderXR0 = encoderXR;
-      globalHeading0 = globalHeading;
+      imuHeading0 = imuHeading;
       odoHeading0 = odoHeading;
    }
 

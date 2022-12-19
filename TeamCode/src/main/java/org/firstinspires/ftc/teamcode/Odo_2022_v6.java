@@ -151,7 +151,7 @@ public class Odo_2022_v6 extends LinearOpMode {
         while (!isStarted()) {
             // Prompt user to press start button.
             telemetry.addData(">", "Press Play to start");
-            telemetry.addData(">", "Robot Heading = %.1f", robot.imuHeading(true));
+            telemetry.addData(">", "Robot Heading = %.1f", robot.returnImuHeading(true));
             telemetry.update();
             sleep(100);
         }
@@ -184,7 +184,7 @@ public class Odo_2022_v6 extends LinearOpMode {
 
                 // Display orientation info.
 //                globalHeading = getHeading();
-                globalHeading = robot.imuHeading();
+                globalHeading = robot.returnImuHeading();
                 odoHeading = getOdoHeading();
 
                 updateXY();

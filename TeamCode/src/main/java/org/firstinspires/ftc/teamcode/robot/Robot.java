@@ -89,6 +89,7 @@ public class Robot {
     Telemetry telemetry;
 
     Orientation angles;
+    double imuHeading;
 
     /* Constructor */
     public Robot(LinearOpMode opMode){
@@ -112,17 +113,30 @@ public class Robot {
             module.clearBulkCache();
         }
         // Read IMU - once per cycle!
-        angles = sensorIMU.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+        //angles = sensorIMU.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+        updateImuHeading();
     }
 
+    private void updateImuHeading() {
+        imuHeading =  imuHeading(true);
+    }
 
-    public double imuHeading() {
+    private double imuHeading() {
         return imuHeading(false);
     }
 
-    public double imuHeading(boolean readme) {
+    private double imuHeading(boolean readme) {
         if (readme) angles = sensorIMU.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
         return angles.firstAngle;
+    }
+
+    public double returnImuHeading() {
+        return imuHeading;
+    }
+
+    public double returnImuHeading(boolean forceread) {
+        if (forceread) updateImuHeading();
+        return imuHeading;
     }
 
     /* Initialize standard Hardware interfaces */
