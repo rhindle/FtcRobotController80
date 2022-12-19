@@ -17,8 +17,10 @@ public class Navigator {
    Telemetry telemetry;
    Robot robot;
    Localizer localizer;
+   Drivetrain drivetrain;
 
-   public Double v0, v2, v1, v3;
+   public double v0, v2, v1, v3;
+   double driveSpeed, driveAngle, rotate;
    double maxSpeed = 1;
    private double storedHeading = 0;
    private double deltaHeading = 0;
@@ -31,11 +33,11 @@ public class Navigator {
    int lastStep = 0;
 
    /* Constructor */
-   public Navigator(LinearOpMode opMode, Robot robot, Localizer localizer){
-      construct(opMode, robot, localizer);
+   public Navigator(LinearOpMode opMode, Robot robot, Localizer localizer,Drivetrain drivetrain){
+      construct(opMode, robot, localizer, drivetrain);
    }
 
-   void construct(LinearOpMode opMode, Robot robot, Localizer localizer){
+   void construct(LinearOpMode opMode, Robot robot, Localizer localizer, Drivetrain drivetrain){
       this.opMode = opMode;
       this.hardwareMap = opMode.hardwareMap;
       this.gamepad1 = opMode.gamepad1;
@@ -43,17 +45,30 @@ public class Navigator {
       this.telemetry = opMode.telemetry;
       this.robot = robot;
       this.localizer = localizer;
+      this.drivetrain = drivetrain;
    }
 
    public void init() {
       v0 = 0.0;
-      v2 = 0.0;
       v1 = 0.0;
+      v2 = 0.0;
       v3 = 0.0;
    }
 
    public void loop() {
+      if (navigate == 1) {
+         autoDrive();
+      }
+      else if (navigate == 2) {
+         scriptedNav2();
+      }
+      else {
+         //userDrive(DriveSpeed, DriveAngle, Rotate);
+         userDrive();
+      }
 
+      // set motor power
+      drivetrain.setDrivePowers(v0, v1, v2, v3);
    }
 
    public enum Actions {
@@ -200,7 +215,8 @@ public class Navigator {
    }
 
    // Determine motor speeds when under driver control
-   public void userDrive (double driveSpeed, double driveAngle, double rotate) {
+//   public void userDrive (double driveSpeed, double driveAngle, double rotate) {
+   public void userDrive () {
       driveSpeed = Math.pow(driveSpeed, 1);
       v0 = driveSpeed * (Math.cos(driveAngle / 180 * Math.PI) - Math.sin(driveAngle / 180 * Math.PI)) + rotate;
       v2 = driveSpeed * (Math.cos(driveAngle / 180 * Math.PI) + Math.sin(driveAngle / 180 * Math.PI)) + rotate;
@@ -272,5 +288,11 @@ public class Navigator {
       targetX += X;
       targetY += Y;
       targetRot += R;
+   }
+
+   public void setUserDriveSettings(double driveSpeed, double driveAngle, double rotate) {
+      this.driveSpeed = driveSpeed;
+      this.driveAngle = driveAngle;
+      this.rotate = rotate;
    }
 }

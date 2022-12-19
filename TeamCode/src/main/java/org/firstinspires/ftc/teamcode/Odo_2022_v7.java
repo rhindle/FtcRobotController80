@@ -81,7 +81,7 @@ public class Odo_2022_v7 extends LinearOpMode {
         buttonMgr = new ButtonMgr(this);
         localizer = new Localizer(this, robot);
         drivetrain = new Drivetrain(this, robot);
-        navigator = new Navigator(this, robot, localizer);
+        navigator = new Navigator(this, robot, localizer, drivetrain);
 
         elapsedTime = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
 
@@ -146,19 +146,22 @@ public class Odo_2022_v7 extends LinearOpMode {
 
                 addTelemetryLoopStart();
                 Controls();
+                navigator.setUserDriveSettings(DriveSpeed, DriveAngle, Rotate);
 
-                if (navigator.navigate == 1) {
-                    navigator.autoDrive();
-                }
-                else if (navigator.navigate == 2) {
-                    navigator.scriptedNav2();
-                }
-                else {
-                    navigator.userDrive(DriveSpeed, DriveAngle, Rotate);
-                }
+                navigator.loop();
 
-                // set motor power
-                drivetrain.setDrivePowers(v0, v1, v2, v3);
+//                if (navigator.navigate == 1) {
+//                    navigator.autoDrive();
+//                }
+//                else if (navigator.navigate == 2) {
+//                    navigator.scriptedNav2();
+//                }
+//                else {
+//                    navigator.userDrive(DriveSpeed, DriveAngle, Rotate);
+//                }
+//
+//                // set motor power
+//                drivetrain.setDrivePowers(v0, v1, v2, v3);
 //                motor0.setPower(v0);
 //                motor2.setPower(v2);
 //                motor1.setPower(v1);
