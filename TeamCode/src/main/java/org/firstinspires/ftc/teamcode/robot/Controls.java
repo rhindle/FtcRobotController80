@@ -1,20 +1,17 @@
 package org.firstinspires.ftc.teamcode.robot;
 
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.Gamepad;
-import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.JavaUtil;
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class Controls {
 
-   LinearOpMode opMode;
+//   LinearOpMode opMode;
 //   HardwareMap hardwareMap;
    Gamepad gamepad1;
    Gamepad gamepad2;
 //   Telemetry telemetry;
-//   Robot robot;
+   Robot robot;
    ButtonMgr buttonMgr;
    Navigator navigator;
    public double DriveSpeed, DriveAngle, Rotate;
@@ -22,19 +19,20 @@ public class Controls {
    public final double tileSize = 23.5;  //in inches
 
    /* Constructor */
-   public Controls(LinearOpMode opMode, ButtonMgr buttonMgr, Navigator navigator){
-      construct(opMode, buttonMgr, navigator);
+   public Controls(Robot robot){//ButtonMgr buttonMgr, Navigator navigator){
+      construct(robot);//buttonMgr, navigator);
    }
 
-   void construct(LinearOpMode opMode, ButtonMgr buttonMgr, Navigator navigator){
-      this.opMode = opMode;
+   void construct(Robot robot){//ButtonMgr buttonMgr, Navigator navigator){
+//      this.opMode = opMode;
 //      this.hardwareMap = opMode.hardwareMap;
-      this.gamepad1 = opMode.gamepad1;
-      this.gamepad2 = opMode.gamepad2;
+
 //      this.telemetry = opMode.telemetry;
-//      this.robot = robot;
-      this.buttonMgr = buttonMgr;
-      this.navigator = navigator;
+      this.robot = robot;
+      this.gamepad1 = robot.opMode.gamepad1;
+      this.gamepad2 = robot.opMode.gamepad2;
+      this.buttonMgr = robot.buttonMgr;
+      this.navigator = robot.navigator;
    }
 
    void init() {

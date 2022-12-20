@@ -38,11 +38,16 @@ public class Odo_2022_v7 extends LinearOpMode {
         //imu = hardwareMap.get(BNO055IMU.class, "imu");
 
         robot = new Robot(this);
-        buttonMgr = new ButtonMgr(this);
-        localizer = new Localizer(this, robot);
-        drivetrain = new Drivetrain(this, robot);
-        navigator = new Navigator(this, robot, localizer, drivetrain);
-        controls = new Controls(this, buttonMgr, navigator);
+//        buttonMgr = new ButtonMgr(this);
+//        localizer = new Localizer(this, robot);
+//        drivetrain = new Drivetrain(this, robot);
+//        navigator = new Navigator(this, robot, localizer, drivetrain);
+//        controls = new Controls(this, buttonMgr, navigator);
+        buttonMgr = robot.buttonMgr;
+        localizer = robot.localizer;
+        drivetrain = robot.drivetrain;
+        navigator = robot.navigator;
+        controls = robot.controls;
 
         elapsedTime = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
 

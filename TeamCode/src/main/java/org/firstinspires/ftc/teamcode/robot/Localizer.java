@@ -1,15 +1,12 @@
 package org.firstinspires.ftc.teamcode.robot;
 
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.Gamepad;
-import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class Localizer {
 
-   LinearOpMode opMode;
+//   LinearOpMode opMode;
 //   HardwareMap hardwareMap;
 //   Gamepad gamepad1;
 //   Gamepad gamepad2;
@@ -28,17 +25,21 @@ public class Localizer {
    private static double eTicksPerRotate = 171500; //171738.8; //170000;
 
    /* Constructor */
-   public Localizer(LinearOpMode opMode, Robot robot){
-      construct(opMode, robot);
+//   public Localizer(LinearOpMode opMode, Robot robot){
+//   public Localizer(LinearOpMode opMode, Robot robot){
+//      construct(opMode, robot);
+//   }
+   public Localizer(Robot robot){
+      construct(robot);
    }
 
-   void construct(LinearOpMode opMode, Robot robot){
-      this.opMode = opMode;
+   void construct(Robot robot){
+//      this.opMode = robot.opMode;
 //      this.hardwareMap = opMode.hardwareMap;
 //      this.gamepad1 = opMode.gamepad1;
 //      this.gamepad2 = opMode.gamepad2;
-      this.telemetry = opMode.telemetry;
       this.robot = robot;
+      this.telemetry = robot.telemetry;
    }
 
    public void loop() {

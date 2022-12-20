@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.robot;
 
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.JavaUtil;
@@ -8,7 +7,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class Navigator {
 
-   LinearOpMode opMode;
+//   LinearOpMode opMode;
 //   HardwareMap hardwareMap;
 //   Gamepad gamepad1;
 //   Gamepad gamepad2;
@@ -36,19 +35,19 @@ public class Navigator {
    Position testPosition = null;
 
    /* Constructor */
-   public Navigator(LinearOpMode opMode, Robot robot, Localizer localizer,Drivetrain drivetrain){
-      construct(opMode, robot, localizer, drivetrain);
+   public Navigator(Robot robot){//}, Localizer localizer,Drivetrain drivetrain){
+      construct(robot);//, localizer, drivetrain);
    }
 
-   void construct(LinearOpMode opMode, Robot robot, Localizer localizer, Drivetrain drivetrain){
-      this.opMode = opMode;
+   void construct(Robot robot){//}, Localizer localizer, Drivetrain drivetrain){
+//      this.opMode = opMode;
 //      this.hardwareMap = opMode.hardwareMap;
 //      this.gamepad1 = opMode.gamepad1;
 //      this.gamepad2 = opMode.gamepad2;
-      this.telemetry = opMode.telemetry;
       this.robot = robot;
-      this.localizer = localizer;
-      this.drivetrain = drivetrain;
+      this.telemetry = robot.telemetry;
+      this.localizer = robot.localizer;
+      this.drivetrain = robot.drivetrain;
    }
 
    public void init() {

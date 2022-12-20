@@ -9,7 +9,6 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
-import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -29,6 +28,12 @@ public class Robot {
 //    public Gamepad gamepad1;
 //    public Gamepad gamepad2;
 //    private Telemetry telemetry;
+
+    public ButtonMgr buttonMgr;
+    public Localizer localizer;
+    public Drivetrain drivetrain;
+    public Navigator navigator;
+    public Controls controls;
 
     public DcMotorEx    motor0   = null;
     public DcMotorEx    motor1   = null;
@@ -94,6 +99,11 @@ public class Robot {
     /* Constructor */
     public Robot(LinearOpMode opMode){
         construct(opMode);
+        buttonMgr = new ButtonMgr(opMode);
+        localizer = new Localizer(this);
+        drivetrain = new Drivetrain(this);
+        navigator = new Navigator(this);//, localizer, drivetrain);
+        controls = new Controls(this);//buttonMgr, navigator);
     }
 
     void construct(LinearOpMode opMode){
