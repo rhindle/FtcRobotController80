@@ -33,6 +33,8 @@ public class Navigator {
    private ElapsedTime navTime = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
    int lastStep = 0;
 
+   Position testPosition = null;
+
    /* Constructor */
    public Navigator(LinearOpMode opMode, Robot robot, Localizer localizer,Drivetrain drivetrain){
       construct(opMode, robot, localizer, drivetrain);
@@ -271,6 +273,13 @@ public class Navigator {
       targetRot += R;
    }
 
+   public void setTargetByDeltaRelative(double X, double Y, double R) {
+      double rot = localizer.globalHeading;
+      targetX += X;
+      targetY += Y;
+      targetRot += R;
+   }
+
    public void setUserDriveSettings(double driveSpeed, double driveAngle, double rotate) {
       this.driveSpeed = driveSpeed;
       this.driveAngle = driveAngle;
@@ -299,37 +308,37 @@ public class Navigator {
       }
    }
 
-   public enum Actions {
-      MOVEACCURATE,
-      MOVETRANSITION,
-      PAUSE,
-      ENDROUTINE
-   }
+//   public enum Actions {
+//      MOVEACCURATE,
+//      MOVETRANSITION,
+//      PAUSE,
+//      ENDROUTINE
+//   }
 
-   public class NavActions {
-      Actions action;
-      double parameter1;
-      double parameter2;
-      double parameter3;
-
-      public NavActions(Actions a, double x, double y, double r) {
-         action = a;
-         parameter1 = x;
-         parameter2 = y;
-         parameter3 = r;
-      }
-      public NavActions(Actions a) {
-         action = a;
-         parameter1 = 0;
-         parameter2 = 0;
-         parameter3 = 0;
-      }
-      public NavActions(Actions a, double p) {
-         action = a;
-         parameter1 = p;
-         parameter2 = 0;
-         parameter3 = 0;
-      }
-   }
+//   public class NavActions {
+//      Actions action;
+//      double parameter1;
+//      double parameter2;
+//      double parameter3;
+//
+//      public NavActions(Actions a, double x, double y, double r) {
+//         action = a;
+//         parameter1 = x;
+//         parameter2 = y;
+//         parameter3 = r;
+//      }
+//      public NavActions(Actions a) {
+//         action = a;
+//         parameter1 = 0;
+//         parameter2 = 0;
+//         parameter3 = 0;
+//      }
+//      public NavActions(Actions a, double p) {
+//         action = a;
+//         parameter1 = p;
+//         parameter2 = 0;
+//         parameter3 = 0;
+//      }
+//   }
 
 }

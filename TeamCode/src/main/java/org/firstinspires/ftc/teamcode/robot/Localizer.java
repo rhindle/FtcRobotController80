@@ -48,7 +48,8 @@ public class Localizer {
 
       imuHeading = robot.returnImuHeading();
       odoHeading = getOdoHeading();
-      globalHeading = imuHeading;
+
+      globalHeading = imuHeading;  // for now, assume IMU is best data
 
       updateXY();
    }
