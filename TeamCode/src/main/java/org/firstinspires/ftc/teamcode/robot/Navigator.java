@@ -193,7 +193,7 @@ public class Navigator {
       v1 = driveSpeed * (Math.cos(driveAngle / 180 * Math.PI) + Math.sin(driveAngle / 180 * Math.PI)) - rotate;
       v3 = driveSpeed * (Math.cos(driveAngle / 180 * Math.PI) - Math.sin(driveAngle / 180 * Math.PI)) - rotate;
 
-      // scale so average motor speed is not more than maxSpeed
+/*      // scale so average motor speed is not more than maxSpeed
       double averageValue = JavaUtil.averageOfList(JavaUtil.createListWith(Math.abs(v0), Math.abs(v2), Math.abs(v1), Math.abs(v3)));
       averageValue = averageValue / maxSpeed;
       if (averageValue > 1) {
@@ -201,7 +201,7 @@ public class Navigator {
          v2 /= averageValue;
          v1 /= averageValue;
          v3 /= averageValue;
-      }
+      }*/
 
       // scale to no higher than 1
       double highValue = JavaUtil.maxOfList(JavaUtil.createListWith(Math.abs(v0), Math.abs(v2), Math.abs(v1), Math.abs(v3), 1));
@@ -274,8 +274,10 @@ public class Navigator {
 
    public void setTargetByDeltaRelative(double X, double Y, double R) {
       double rot = localizer.globalHeading;
-      targetX += X;
-      targetY += Y;
+//      slamraRobotPose.X = sX + (rX*Math.cos(Math.toRadians(sR)) - rY*Math.sin(Math.toRadians(sR)));
+//      slamraRobotPose.Y = sY + (rX*Math.sin(Math.toRadians(sR)) + rY*Math.cos(Math.toRadians(sR)));
+      targetX = targetX + (X * Math.cos(Math.toRadians(rot)) - Y * Math.sin(Math.toRadians(rot)));
+      targetY = targetY + (X * Math.sin(Math.toRadians(rot)) + Y * Math.cos(Math.toRadians(rot)));
       targetRot += R;
    }
 

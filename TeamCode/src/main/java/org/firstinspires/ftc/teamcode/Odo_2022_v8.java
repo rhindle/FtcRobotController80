@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.JavaUtil;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.robot.ButtonMgr;
 import org.firstinspires.ftc.teamcode.robot.Controls;
 import org.firstinspires.ftc.teamcode.robot.Drivetrain;
@@ -12,9 +13,9 @@ import org.firstinspires.ftc.teamcode.robot.Localizer;
 import org.firstinspires.ftc.teamcode.robot.Navigator;
 import org.firstinspires.ftc.teamcode.robot.Robot;
 
-@TeleOp(name = "3Odo_2022_v7_", group = "")
+@TeleOp(name = "3Odo_2022_v8", group = "")
 //@Disabled
-public class Odo_2022_v7 extends LinearOpMode {
+public class Odo_2022_v8 extends LinearOpMode {
 
     private ElapsedTime elapsedTime; // = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
 
@@ -171,6 +172,10 @@ public class Odo_2022_v7 extends LinearOpMode {
         telemetry.addData ("OdoXR", localizer.encoderXR);
         telemetry.addData ("X", JavaUtil.formatNumber(localizer.xPos, 2));
         telemetry.addData ("Y", JavaUtil.formatNumber(localizer.yPos, 2));
+
+        telemetry.addData("rangeL", String.format("%.01f in", robot.distL));
+        telemetry.addData("rangeM", String.format("%.01f in", robot.distM));
+        telemetry.addData("rangeR", String.format("%.01f in", robot.distR));
     }
 
     // Calculate loop time for performance optimization

@@ -67,6 +67,32 @@ public class Controls {
       if (buttonMgr.wasReleased(1, ButtonMgr.Buttons.rightJoyStickBUTTON))
          navigator.setDeltaHeading();
 
+      // This blob is for manually entering destinations by adjusting X, Y, Rot
+      if (buttonMgr.wasTapped(1, ButtonMgr.Buttons.dpadUP))
+         navigator.setTargetByDeltaRelative(2,0,0);
+      if (buttonMgr.wasTapped(1, ButtonMgr.Buttons.dpadDOWN))
+         navigator.setTargetByDeltaRelative(-2,0,0);
+      if (buttonMgr.wasTapped(1, ButtonMgr.Buttons.dpadLEFT))
+         navigator.setTargetByDeltaRelative(0, 2,0);
+      if (buttonMgr.wasTapped(1, ButtonMgr.Buttons.dpadRIGHT))
+         navigator.setTargetByDeltaRelative(0, -2,0);
+      if (buttonMgr.wasTapped(1, ButtonMgr.Buttons.X))
+         navigator.setTargetByDeltaRelative(0,0,10);
+      if (buttonMgr.wasTapped(1, ButtonMgr.Buttons.Y))
+         navigator.setTargetByDeltaRelative(0,0,-10);
+      if (buttonMgr.wasTapped(1, ButtonMgr.Buttons.A)) {
+         navigator.setTargetToCurrentPosition();
+         navigator.beginAutoDrive();
+      }
+      if (buttonMgr.wasTapped(1, ButtonMgr.Buttons.B))
+         navigator.cancelAutoNavigation();
+      if (!buttonMgr.isPressed(1, ButtonMgr.Buttons.rightBUMPER))
+         navigator.setMaxSpeed(1);
+      else
+         navigator.setMaxSpeed(0.25);
+      if (buttonMgr.wasTapped(1, ButtonMgr.Buttons.leftBUMPER))
+         robot.readDistSensors();
+
       // AutoDrive Testing
 
       // Start auto navigation
