@@ -25,6 +25,8 @@ public class Navigator {
    boolean useHeadingHold = true;
    boolean useHoldPosition = true;
    boolean usePoleFinder = true;
+   boolean useAutoDistanceActivation = true;
+   boolean isTrackingPole = false;
    long headingDelay = System.currentTimeMillis();
    long idleDelay = System.currentTimeMillis();
 
@@ -73,6 +75,7 @@ public class Navigator {
       else {
          userDrive();
          if (idleDelay < System.currentTimeMillis() && useHoldPosition) {
+            if (useAutoDistanceActivation) robot.sensors.readDistSensors(true);
             if (usePoleFinder) autoPoleCenter();
             autoDrive();
          }
@@ -144,23 +147,30 @@ public class Navigator {
       double R = robot.sensors.distR;
       double LM = Math.abs(L-M);
       double RM = Math.abs(R-M);
+      double closest = Math.min(L, Math.min(R,M));
+      isTrackingPole = false;
       if (L == -1 || M == -1 || R == -1) return;   // sensor not read so don't bother continuing
       if (L < 10 || M < 10 || R < 10) {            // at least one sensor is reading low
          if (L < M && LM > 1) {                    // to the left
-            setTargetByDeltaRelative(0, 0.25,0);
+            setTargetByDeltaRelative(0, 0.125,0);
+            isTrackingPole = true;
          }
          if (R < M && RM > 1) {                    // to the right
-            setTargetByDeltaRelative(0, -0.25,0);
+            setTargetByDeltaRelative(0, -0.125,0);
+            isTrackingPole = true;
          }
-         if (M < L && M < R) {                     // apparently centered
-            if (M < 5) {
-               setTargetByDeltaRelative(-0.25,0,0);
+         //if (M < L && M < R) {                     // apparently centered
+            if (closest < 3) {   //was M
+               setTargetByDeltaRelative(-0.1,0,0);
+               isTrackingPole = true;
             }
-            if (M > 7) {
-               setTargetByDeltaRelative(0.25,0,0);
+            if (closest > 5) {
+               setTargetByDeltaRelative(0.1,0,0);
+               isTrackingPole = true;
             }
-         }
+         //}
       }
+      robot.sensors.ledRED.setState(!isTrackingPole);
    }
 
    // Determine motor speeds when under automatic control
@@ -193,6 +203,12 @@ public class Navigator {
       if (accurate==false) pDist = 1;  // don't bother with proportional when hitting transitional destinations
       // linear proportional at 15°, minimum 0.025
       pRot = Math.max(Math.min(Math.abs(deltaRot)/15,1),0.025)*Math.signum(deltaRot)*-1;
+
+      //special cases:  Ramp up the proportional for pole finding (find a better way to do this)
+      if (isTrackingPole) {
+         pDist = Math.max(Math.min(distance/4,1),0.15);
+         pRot = Math.max(Math.min(Math.abs(deltaRot)/15,1),0.025)*Math.signum(deltaRot)*-1;  //increase this?
+      }
 
       telemetry.addData("NavDistance", JavaUtil.formatNumber(distance, 2));
       telemetry.addData("NavAngle", JavaUtil.formatNumber(navAngle, 2));
@@ -320,6 +336,7 @@ public class Navigator {
 
    public void togglePositionHold() {
       useHoldPosition = !useHoldPosition;
+      if (useHoldPosition) setTargetToCurrentPosition();
    }
 
    public void setTargetByDelta(double X, double Y, double R) {
@@ -334,12 +351,14 @@ public class Navigator {
 //      slamraRobotPose.Y = sY + (rX*Math.sin(Math.toRadians(sR)) + rY*Math.cos(Math.toRadians(sR)));
       targetX = targetX + (X * Math.cos(Math.toRadians(rot)) - Y * Math.sin(Math.toRadians(rot)));
       targetY = targetY + (X * Math.sin(Math.toRadians(rot)) + Y * Math.cos(Math.toRadians(rot)));
+//!!!!bug?      targetRot += R;
       targetRot += R;
    }
 
    public void setUserDriveSettings(double driveSpeed, double driveAngle, double rotate) {
       if (!(driveSpeed == 0 && rotate == 0)) {
-         idleDelay = System.currentTimeMillis() + 250;
+         idleDelay = System.currentTimeMillis() + 500;  //was 250 to match rotate?
+         if (useAutoDistanceActivation) robot.sensors.readDistSensors(false);
       }
       this.driveSpeed = driveSpeed;
       this.driveAngle = driveAngle;
@@ -351,6 +370,7 @@ public class Navigator {
       // Modify for Hold Angle
       if (useHeadingHold) {
          // Correct the heading if not currently being controlled
+         // this should probably be incorporated into autodrive
          if (headingDelay <= System.currentTimeMillis()) {  // shouldn't need to check if == 0
             this.rotate = getError(storedHeading) / -15 * (driveSpeed + 0.2);   // base this on speed?
          }

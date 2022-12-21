@@ -76,14 +76,19 @@ public class Controls {
          navigator.setTargetByDeltaRelative(0, 2,0);
       if (buttonMgr.wasTapped(1, ButtonMgr.Buttons.dpadRIGHT))
          navigator.setTargetByDeltaRelative(0, -2,0);
-      if (buttonMgr.wasTapped(1, ButtonMgr.Buttons.X))
-         navigator.setTargetByDeltaRelative(0,0,10);
-      if (buttonMgr.wasTapped(1, ButtonMgr.Buttons.Y))
-         navigator.setTargetByDeltaRelative(0,0,-10);
+      if (buttonMgr.wasTapped(1, ButtonMgr.Buttons.X)) {
+         navigator.setTargetByDeltaRelative(0, 0, 10);
+         navigator.headingDelay = System.currentTimeMillis() + 500;  // workaround
+      }
+      if (buttonMgr.wasTapped(1, ButtonMgr.Buttons.Y)) {
+         navigator.setTargetByDeltaRelative(0, 0, -10);
+         navigator.headingDelay = System.currentTimeMillis() + 500;  // workaround
+      }
       if (buttonMgr.wasTapped(1, ButtonMgr.Buttons.A)) {
 //         navigator.setTargetToCurrentPosition();
 //         navigator.beginAutoDrive();
 //         navigator.togglePositionHold();
+         navigator.useAutoDistanceActivation = !navigator.useAutoDistanceActivation;
       }
       if (buttonMgr.wasTapped(1, ButtonMgr.Buttons.B))
          //navigator.cancelAutoNavigation();

@@ -151,6 +151,9 @@ public class Odo_2022_v8 extends LinearOpMode {
     private void addTelemetryLoopStart() {
         telemetry.addData("Loop time (ms)", JavaUtil.formatNumber(calculateLoopTime(), 0));
         telemetry.addData("heading", JavaUtil.formatNumber(robot.returnImuHeading(),2));
+        telemetry.addData("rangeL", String.format("%.01f in", robot.sensors.distL));
+        telemetry.addData("rangeM", String.format("%.01f in", robot.sensors.distM));
+        telemetry.addData("rangeR", String.format("%.01f in", robot.sensors.distR));
     }
 
     private void addTelemetryLoopEnd() {
@@ -175,9 +178,9 @@ public class Odo_2022_v8 extends LinearOpMode {
         telemetry.addData ("X", JavaUtil.formatNumber(localizer.xPos, 2));
         telemetry.addData ("Y", JavaUtil.formatNumber(localizer.yPos, 2));
 
-        telemetry.addData("rangeL", String.format("%.01f in", robot.sensors.distL));
-        telemetry.addData("rangeM", String.format("%.01f in", robot.sensors.distM));
-        telemetry.addData("rangeR", String.format("%.01f in", robot.sensors.distR));
+//        telemetry.addData("rangeL", String.format("%.01f in", robot.sensors.distL));
+//        telemetry.addData("rangeM", String.format("%.01f in", robot.sensors.distM));
+//        telemetry.addData("rangeR", String.format("%.01f in", robot.sensors.distR));
     }
 
     // Calculate loop time for performance optimization

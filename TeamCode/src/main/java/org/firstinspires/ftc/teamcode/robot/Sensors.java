@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.robot;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -20,6 +21,8 @@ public class Sensors {
    public DistanceSensor sensor2MLeft = null;
    public DistanceSensor sensor2MMiddle = null;
    public DistanceSensor sensor2MRight = null;
+   public DigitalChannel ledRED = null;
+   public DigitalChannel ledGREEN = null;
 
    public double distL, distM, distR;
    private int distCounter = 0;
@@ -44,6 +47,12 @@ public class Sensors {
       sensor2MLeft = hardwareMap.get(DistanceSensor.class, "2MdistL");
       sensor2MMiddle = hardwareMap.get(DistanceSensor.class, "2MdistM");
       sensor2MRight = hardwareMap.get(DistanceSensor.class, "2MdistR");
+      ledRED = hardwareMap.get(DigitalChannel.class, "digital6B");
+      ledGREEN = hardwareMap.get(DigitalChannel.class, "digital7B");
+      ledRED.setMode(DigitalChannel.Mode.OUTPUT);
+      ledGREEN.setMode(DigitalChannel.Mode.OUTPUT);
+      ledRED.setState(true);
+      ledGREEN.setState(true);
    }
 
    public void loop(){
@@ -62,9 +71,12 @@ public class Sensors {
             case 2:
                distR = sensor2MRight.getDistance(DistanceUnit.INCH);
                break;
+            case 3:    // does it work better if we alternate?
+               distM = sensor2MMiddle.getDistance(DistanceUnit.INCH);
+               break;
          }
          distCounter++;
-         if (distCounter > 2) distCounter = 0;
+         if (distCounter > 3) distCounter = 0;
       } else {
          distL = -1;
          distM = -1;
@@ -74,9 +86,11 @@ public class Sensors {
 
    public void readDistSensors (boolean boo) {
       readDistSensors = boo;
+      ledGREEN.setState(!readDistSensors);
    }
    public void readDistSensors () {
       readDistSensors = !readDistSensors;
+      ledGREEN.setState(!readDistSensors);
    }
 
 
