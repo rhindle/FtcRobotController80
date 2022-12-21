@@ -23,7 +23,10 @@ public class Navigator {
    public double deltaHeading = 0;
    boolean useFieldCentricDrive = true;
    boolean useHeadingHold = true;
+   boolean useHoldPosition = true;
+   boolean usePoleFinder = true;
    long headingDelay = System.currentTimeMillis();
+   long idleDelay = System.currentTimeMillis();
 
    public double targetX, targetY, targetRot;
    public int navigate = 0;
@@ -69,6 +72,10 @@ public class Navigator {
       }
       else {
          userDrive();
+         if (idleDelay < System.currentTimeMillis() && useHoldPosition) {
+            if (usePoleFinder) autoPoleCenter();
+            autoDrive();
+         }
       }
 
       drivetrain.setDrivePowers(v0, v1, v2, v3);
@@ -131,6 +138,31 @@ public class Navigator {
       }
    }
 
+   public void autoPoleCenter () {
+      double L = robot.sensors.distL;
+      double M = robot.sensors.distM;
+      double R = robot.sensors.distR;
+      double LM = Math.abs(L-M);
+      double RM = Math.abs(R-M);
+      if (L == -1 || M == -1 || R == -1) return;   // sensor not read so don't bother continuing
+      if (L < 10 || M < 10 || R < 10) {            // at least one sensor is reading low
+         if (L < M && LM > 1) {                    // to the left
+            setTargetByDeltaRelative(0, 0.25,0);
+         }
+         if (R < M && RM > 1) {                    // to the right
+            setTargetByDeltaRelative(0, -0.25,0);
+         }
+         if (M < L && M < R) {                     // apparently centered
+            if (M < 5) {
+               setTargetByDeltaRelative(-0.25,0,0);
+            }
+            if (M > 7) {
+               setTargetByDeltaRelative(0.25,0,0);
+            }
+         }
+      }
+   }
+
    // Determine motor speeds when under automatic control
    public void autoDrive () {
       double distance, deltaX, deltaY, deltaRot, pDist, pRot, navAngle;
@@ -187,6 +219,13 @@ public class Navigator {
    // Determine motor speeds when under driver control
 //   public void userDrive (double driveSpeed, double driveAngle, double rotate) {
    public void userDrive () {
+//      if (!(driveSpeed == 0 && driveAngle == 0 && rotate == 0)) {
+//         idleDelay = System.currentTimeMillis() + 100;
+//      }
+      if (idleDelay > System.currentTimeMillis()) {
+         setTargetToCurrentPosition();
+      }
+
       driveSpeed = Math.pow(driveSpeed, 1);
       v0 = driveSpeed * (Math.cos(driveAngle / 180 * Math.PI) - Math.sin(driveAngle / 180 * Math.PI)) + rotate;
       v2 = driveSpeed * (Math.cos(driveAngle / 180 * Math.PI) + Math.sin(driveAngle / 180 * Math.PI)) + rotate;
@@ -279,6 +318,10 @@ public class Navigator {
       storedHeading = localizer.returnGlobalHeading();
    }
 
+   public void togglePositionHold() {
+      useHoldPosition = !useHoldPosition;
+   }
+
    public void setTargetByDelta(double X, double Y, double R) {
       targetX += X;
       targetY += Y;
@@ -295,6 +338,9 @@ public class Navigator {
    }
 
    public void setUserDriveSettings(double driveSpeed, double driveAngle, double rotate) {
+      if (!(driveSpeed == 0 && rotate == 0)) {
+         idleDelay = System.currentTimeMillis() + 250;
+      }
       this.driveSpeed = driveSpeed;
       this.driveAngle = driveAngle;
       this.rotate = rotate;

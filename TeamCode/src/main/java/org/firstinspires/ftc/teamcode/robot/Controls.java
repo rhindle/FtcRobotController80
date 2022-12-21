@@ -81,11 +81,13 @@ public class Controls {
       if (buttonMgr.wasTapped(1, ButtonMgr.Buttons.Y))
          navigator.setTargetByDeltaRelative(0,0,-10);
       if (buttonMgr.wasTapped(1, ButtonMgr.Buttons.A)) {
-         navigator.setTargetToCurrentPosition();
-         navigator.beginAutoDrive();
+//         navigator.setTargetToCurrentPosition();
+//         navigator.beginAutoDrive();
+//         navigator.togglePositionHold();
       }
       if (buttonMgr.wasTapped(1, ButtonMgr.Buttons.B))
-         navigator.cancelAutoNavigation();
+         //navigator.cancelAutoNavigation();
+         navigator.togglePositionHold();
       if (!buttonMgr.isPressed(1, ButtonMgr.Buttons.rightBUMPER))
          navigator.setMaxSpeed(1);
       else
