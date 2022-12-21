@@ -1,0 +1,83 @@
+package org.firstinspires.ftc.teamcode.robot;
+
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
+import com.qualcomm.robotcore.hardware.Gamepad;
+import com.qualcomm.robotcore.hardware.HardwareMap;
+
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+
+public class Sensors {
+
+//   LinearOpMode opMode;
+   HardwareMap hardwareMap;
+//   Gamepad gamepad1;
+//   Gamepad gamepad2;
+   Telemetry telemetry;
+   Robot robot;
+
+   public DistanceSensor sensor2MLeft = null;
+   public DistanceSensor sensor2MMiddle = null;
+   public DistanceSensor sensor2MRight = null;
+
+   public double distL, distM, distR;
+   private int distCounter = 0;
+   private boolean readDistSensors = false;
+
+   /* Constructor */
+   public Sensors(Robot robot){
+      construct(robot);
+   }
+
+   void construct(Robot robot){
+//      this.opMode = opMode;
+//      this.hardwareMap = opMode.hardwareMap;
+//      this.gamepad1 = opMode.gamepad1;
+//      this.gamepad2 = opMode.gamepad2;
+      this.robot = robot;
+      this.telemetry = robot.telemetry;
+      this.hardwareMap = robot.hardwareMap;
+   }
+
+   public void init(){
+      sensor2MLeft = hardwareMap.get(DistanceSensor.class, "2MdistL");
+      sensor2MMiddle = hardwareMap.get(DistanceSensor.class, "2MdistM");
+      sensor2MRight = hardwareMap.get(DistanceSensor.class, "2MdistR");
+   }
+
+   public void loop(){
+      updateDistanceSensors();
+   }
+
+   private void updateDistanceSensors() {
+      if (readDistSensors) {
+         switch (distCounter) {
+            case 0:
+               distL = sensor2MLeft.getDistance(DistanceUnit.INCH);
+               break;
+            case 1:
+               distM = sensor2MMiddle.getDistance(DistanceUnit.INCH);
+               break;
+            case 2:
+               distR = sensor2MRight.getDistance(DistanceUnit.INCH);
+               break;
+         }
+         distCounter++;
+         if (distCounter > 2) distCounter = 0;
+      } else {
+         distL = -1;
+         distM = -1;
+         distR = -1;
+      }
+   }
+
+   public void readDistSensors (boolean boo) {
+      readDistSensors = boo;
+   }
+   public void readDistSensors () {
+      readDistSensors = !readDistSensors;
+   }
+
+
+}

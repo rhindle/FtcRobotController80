@@ -203,6 +203,19 @@ public class Navigator {
          v3 /= averageValue;
       }*/
 
+      // scale so average motor speed is not more than maxSpeed
+      // but only if maxspeed <> 1
+      if (maxSpeed != 1) {
+         double averageValue = JavaUtil.averageOfList(JavaUtil.createListWith(Math.abs(v0), Math.abs(v2), Math.abs(v1), Math.abs(v3)));
+         averageValue = averageValue / maxSpeed;
+         if (averageValue > 1) {
+            v0 /= averageValue;
+            v2 /= averageValue;
+            v1 /= averageValue;
+            v3 /= averageValue;
+         }
+      }
+
       // scale to no higher than 1
       double highValue = JavaUtil.maxOfList(JavaUtil.createListWith(Math.abs(v0), Math.abs(v2), Math.abs(v1), Math.abs(v3), 1));
       v0 /= highValue;

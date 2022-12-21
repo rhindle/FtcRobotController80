@@ -91,7 +91,7 @@ public class Controls {
       else
          navigator.setMaxSpeed(0.25);
       if (buttonMgr.wasTapped(1, ButtonMgr.Buttons.leftBUMPER))
-         robot.readDistSensors();
+         robot.sensors.readDistSensors();
 
       // AutoDrive Testing
 

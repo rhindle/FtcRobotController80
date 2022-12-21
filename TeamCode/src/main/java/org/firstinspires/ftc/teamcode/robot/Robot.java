@@ -34,6 +34,7 @@ public class Robot {
     public Localizer localizer;
     public Drivetrain drivetrain;
     public Navigator navigator;
+    public Sensors sensors;
 //    public Controls controls;
 
     public DcMotorEx    motor0   = null;
@@ -60,9 +61,9 @@ public class Robot {
 
     public ColorSensor sensorColor    = null;
 
-    public DistanceSensor sensor2MLeft = null;
-    public DistanceSensor sensor2MMiddle = null;
-    public DistanceSensor sensor2MRight = null;
+//    public DistanceSensor sensor2MLeft = null;
+//    public DistanceSensor sensor2MMiddle = null;
+//    public DistanceSensor sensor2MRight = null;
 
     public DigitalChannel   digital0 = null;
     public DigitalChannel   digital1 = null;
@@ -100,9 +101,9 @@ public class Robot {
     Orientation angles;
     double imuHeading;
 
-    public double distL, distM, distR;
-    private int distCounter = 0;
-    private boolean readDistSensors = false;
+//    public double distL, distM, distR;
+//    private int distCounter = 0;
+//    private boolean readDistSensors = false;
 
     /* Constructor */
     public Robot(LinearOpMode opMode){
@@ -111,6 +112,7 @@ public class Robot {
         localizer = new Localizer(this);
         drivetrain = new Drivetrain(this);
         navigator = new Navigator(this);//, localizer, drivetrain);
+        sensors = new Sensors(this);
 //        controls = new Controls(this);//buttonMgr, navigator);
     }
 
@@ -133,41 +135,41 @@ public class Robot {
         // Read IMU - once per cycle!
         //angles = sensorIMU.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
         updateImuHeading();
-        updateDistanceSensors();
+//        updateDistanceSensors();
     }
 
-    public void readDistSensors (boolean boo) {
-        readDistSensors = boo;
-    }
-    public void readDistSensors () {
-        readDistSensors = !readDistSensors;
-    }
-
+//    public void readDistSensors (boolean boo) {
+//        readDistSensors = boo;
+//    }
+//    public void readDistSensors () {
+//        readDistSensors = !readDistSensors;
+//    }
+//
     private void updateImuHeading() {
         imuHeading =  imuHeading(true);
     }
 
-    private void updateDistanceSensors() {
-        if (readDistSensors) {
-            switch (distCounter) {
-                case 0:
-                    distL = sensor2MLeft.getDistance(DistanceUnit.INCH);
-                    break;
-                case 1:
-                    distM = sensor2MMiddle.getDistance(DistanceUnit.INCH);
-                    break;
-                case 2:
-                    distR = sensor2MRight.getDistance(DistanceUnit.INCH);
-                    break;
-            }
-            distCounter++;
-            if (distCounter > 2) distCounter = 0;
-        } else {
-            distL = -1;
-            distM = -1;
-            distR = -1;
-        }
-    }
+//    private void updateDistanceSensors() {
+//        if (readDistSensors) {
+//            switch (distCounter) {
+//                case 0:
+//                    distL = sensor2MLeft.getDistance(DistanceUnit.INCH);
+//                    break;
+//                case 1:
+//                    distM = sensor2MMiddle.getDistance(DistanceUnit.INCH);
+//                    break;
+//                case 2:
+//                    distR = sensor2MRight.getDistance(DistanceUnit.INCH);
+//                    break;
+//            }
+//            distCounter++;
+//            if (distCounter > 2) distCounter = 0;
+//        } else {
+//            distL = -1;
+//            distM = -1;
+//            distR = -1;
+//        }
+//    }
 
     private double imuHeading() {
         return imuHeading(false);
@@ -297,8 +299,8 @@ public class Robot {
 //        sensorColor = hwMap.get(ColorSensor.class, "sensorColorRange");
 //        sensorDistance = hwMap.get(DistanceSensor.class, "sensorColorRange");
 
-        sensor2MLeft = hardwareMap.get(DistanceSensor.class, "2MdistL");
-        sensor2MMiddle = hardwareMap.get(DistanceSensor.class, "2MdistM");
-        sensor2MRight = hardwareMap.get(DistanceSensor.class, "2MdistR");
+//        sensor2MLeft = hardwareMap.get(DistanceSensor.class, "2MdistL");
+//        sensor2MMiddle = hardwareMap.get(DistanceSensor.class, "2MdistM");
+//        sensor2MRight = hardwareMap.get(DistanceSensor.class, "2MdistR");
     }
 }

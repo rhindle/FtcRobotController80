@@ -54,6 +54,7 @@ public class Odo_2022_v8 extends LinearOpMode {
         elapsedTime = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
 
         robot.init();
+        robot.sensors.init();
         drivetrain.init();
         navigator.init();
 
@@ -75,6 +76,7 @@ public class Odo_2022_v8 extends LinearOpMode {
                 robot.loop();               // Clears bulk data and reads IMU
                 buttonMgr.loop();           // Processes digital controller input
                 localizer.loop();           // Updates odometry X, Y, Rotation
+                robot.sensors.loop();       // Update distance sensors, etc.
 
                 addTelemetryLoopStart();
 
@@ -173,9 +175,9 @@ public class Odo_2022_v8 extends LinearOpMode {
         telemetry.addData ("X", JavaUtil.formatNumber(localizer.xPos, 2));
         telemetry.addData ("Y", JavaUtil.formatNumber(localizer.yPos, 2));
 
-        telemetry.addData("rangeL", String.format("%.01f in", robot.distL));
-        telemetry.addData("rangeM", String.format("%.01f in", robot.distM));
-        telemetry.addData("rangeR", String.format("%.01f in", robot.distR));
+        telemetry.addData("rangeL", String.format("%.01f in", robot.sensors.distL));
+        telemetry.addData("rangeM", String.format("%.01f in", robot.sensors.distM));
+        telemetry.addData("rangeR", String.format("%.01f in", robot.sensors.distR));
     }
 
     // Calculate loop time for performance optimization
