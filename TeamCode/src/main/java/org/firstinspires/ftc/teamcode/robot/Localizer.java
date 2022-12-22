@@ -22,7 +22,10 @@ public class Localizer {
    public double yPos, xPos;
 
    private static double eTicksPerInch = 82300 / 48;
-   private static double eTicksPerRotate = 171500; //171738.8; //170000;
+   private static double eTicksPerRotate = 169619; //171500; //171738.8; //170000;
+
+   //20221222 Measured 10 rot: 846684,850800; 845875,851775; 845127,845543; 848073,850867
+   //                          169748.4		169765		169067		169894		==>  169618.6
 
    /* Constructor */
 //   public Localizer(LinearOpMode opMode, Robot robot){

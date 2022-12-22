@@ -67,6 +67,9 @@ public class Controls {
       if (buttonMgr.wasReleased(1, ButtonMgr.Buttons.rightJoyStickBUTTON))
          navigator.setDeltaHeading();
 
+      if (buttonMgr.wasReleased(1, ButtonMgr.Buttons.leftJoyStickBUTTON))
+         navigator.toggleSnapToAngle();
+
       // This blob is for manually entering destinations by adjusting X, Y, Rot
       if (buttonMgr.wasTapped(1, ButtonMgr.Buttons.dpadUP))
          navigator.setTargetByDeltaRelative(2,0,0);
@@ -77,11 +80,13 @@ public class Controls {
       if (buttonMgr.wasTapped(1, ButtonMgr.Buttons.dpadRIGHT))
          navigator.setTargetByDeltaRelative(0, -2,0);
       if (buttonMgr.wasTapped(1, ButtonMgr.Buttons.X)) {
-         navigator.setTargetByDeltaRelative(0, 0, 10);
+//         navigator.setTargetByDeltaRelative(0, 0, 45);
+         navigator.setTargetRotBySnapRelative (45);
          navigator.headingDelay = System.currentTimeMillis() + 500;  // workaround
       }
       if (buttonMgr.wasTapped(1, ButtonMgr.Buttons.Y)) {
-         navigator.setTargetByDeltaRelative(0, 0, -10);
+//         navigator.setTargetByDeltaRelative(0, 0, -45);
+         navigator.setTargetRotBySnapRelative (-45);
          navigator.headingDelay = System.currentTimeMillis() + 500;  // workaround
       }
       if (buttonMgr.wasTapped(1, ButtonMgr.Buttons.A)) {

@@ -26,6 +26,7 @@ public class Navigator {
    boolean useHoldPosition = true;
    boolean usePoleFinder = true;
    boolean useAutoDistanceActivation = true;
+   boolean useSnapToAngle = false;
    boolean isTrackingPole = false;
    long headingDelay = System.currentTimeMillis();
    long idleDelay = System.currentTimeMillis();
@@ -184,7 +185,7 @@ public class Navigator {
       deltaY = targetY - localizer.yPos;  // error in y
       telemetry.addData("DeltaX", JavaUtil.formatNumber(deltaX, 2));
       telemetry.addData("DeltaY", JavaUtil.formatNumber(deltaY, 2));
-      deltaRot = getError(targetRot);  // error in rotation
+      deltaRot = getError(targetRot);  // error in rotation   //20221222 added deltaheading!?
       distance = Math.sqrt(Math.pow(deltaX,2) + Math.pow(deltaY,2));  // distance (error) from xy destination
 
       //exit criteria if destination has been adequately reached
@@ -339,10 +340,22 @@ public class Navigator {
       if (useHoldPosition) setTargetToCurrentPosition();
    }
 
+   public void toggleSnapToAngle() {
+      useSnapToAngle = !useSnapToAngle;
+   }
+
    public void setTargetByDelta(double X, double Y, double R) {
       targetX += X;
       targetY += Y;
       targetRot += R;
+   }
+
+   public void setTargetRotBySnapRelative(double R) {
+/*      targetRot = localizer.globalHeading;
+      targetRot += deltaHeading%45;  //!!!!  */
+      targetRot += R;
+      targetRot = Math.round(targetRot/45)*45;
+      storedHeading = targetRot;
    }
 
    public void setTargetByDeltaRelative(double X, double Y, double R) {
@@ -367,14 +380,26 @@ public class Navigator {
       if (useFieldCentricDrive) {
          this.driveAngle = driveAngle - storedHeading + deltaHeading;
       }
+      // Modify for Snap to Angle
+      if (useSnapToAngle) {
+         snapToAngle();
+      }
       // Modify for Hold Angle
-      if (useHeadingHold) {
+      if (useHeadingHold || useSnapToAngle) {
          // Correct the heading if not currently being controlled
          // this should probably be incorporated into autodrive
          if (headingDelay <= System.currentTimeMillis()) {  // shouldn't need to check if == 0
             this.rotate = getError(storedHeading) / -15 * (driveSpeed + 0.2);   // base this on speed?
          }
       }
+
+   }
+
+   void snapToAngle() {
+//      storedHeading = Math.round(localizer.returnGlobalHeading()/45)*45;
+//      storedHeading += deltaHeading%45;
+      storedHeading = Math.round(storedHeading/45)*45;
+      targetRot = storedHeading;
    }
 
    public void handleRotate(double rotate) {
