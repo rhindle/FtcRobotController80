@@ -20,6 +20,7 @@ public class Localizer {
    double imuHeading, imuHeading0;
    public double globalHeading, globalHeading0;
    public double yPos, xPos;
+   public boolean useFusedHeading = true;
 
    private static double eTicksPerInch = 82300 / 48;
    private static double eTicksPerRotate = 169619; //171500; //171738.8; //170000;
@@ -45,19 +46,6 @@ public class Localizer {
       this.telemetry = robot.telemetry;
    }
 
-   public void loop() {
-      encoderY = odoY.getCurrentPosition();
-      encoderXL = odoXL.getCurrentPosition();
-      encoderXR = odoXR.getCurrentPosition();
-
-      imuHeading = robot.returnImuHeading();
-      odoHeading = getOdoHeading();
-
-      globalHeading = imuHeading;  // for now, assume IMU is best data
-
-      updateXY();
-   }
-
    public void init() {
       odoY = robot.motor0B;
       odoXR = robot.motor1B;
@@ -77,6 +65,48 @@ public class Localizer {
       odoHeading0 = getOdoHeading();
 
       globalHeading0 = imuHeading0;
+   }
+
+   public void loop() {
+      encoderY = odoY.getCurrentPosition();
+      encoderXL = odoXL.getCurrentPosition();
+      encoderXR = odoXR.getCurrentPosition();
+
+      imuHeading = robot.returnImuHeading();
+      odoHeading = getOdoHeading();
+
+      showImuSettled();
+
+//      globalHeading = imuHeading;  // for now, assume IMU is best data
+      globalHeading = fusedHeading();
+
+      updateXY();
+   }
+
+   private double fusedHeading() {
+      // don't fuse if the flag isn't set
+      if (!useFusedHeading) return imuHeading;
+      // use imuHeading if it's settled
+      if (Math.abs(Support.normalizeAngle(imuHeading - imuHeading0)) < 0.5) return imuHeading;
+      // otherwise fuse it with odoHeading data
+      return Support.normalizeAngle(globalHeading0 + (odoHeading - odoHeading0));
+   }
+
+   private void showImuSettled() {
+      // note that imuHeading0 and odoHeading0 are updated by updateXY(), so this comparison needs to happen first.
+      double delta = imuHeading - imuHeading0;
+      delta = Support.normalizeAngle(delta);
+      if (useFusedHeading) {
+         if (Math.abs(delta) < 0.5) robot.sensors.setLedGREEN(true);
+         else robot.sensors.setLedGREEN(false);
+      }else{
+         if (Math.abs(delta) < 0.5) robot.sensors.setLedRED(true);
+         else robot.sensors.setLedRED(false);
+      }
+   }
+
+   public void toggleUseFusedHeading() {
+      useFusedHeading = !useFusedHeading;
    }
 
    // get heading from the odometry; accuracy varies :-(
@@ -109,7 +139,8 @@ public class Localizer {
       //myHeading = globalHeading;
       // Future - figure out average heading.  Challenge is the wrap.  Maybe use getError, /2, add to heading???
       //myHeading = getAvgHeading(odoHeading0,odoHeading);
-      myHeading = getAvgHeading(imuHeading0, imuHeading);
+//      myHeading = getAvgHeading(imuHeading0, imuHeading);
+      myHeading = getAvgHeading(globalHeading0, globalHeading);
 
       telemetry.addData ("My Average Heading", myHeading);
 
@@ -124,6 +155,7 @@ public class Localizer {
       encoderXR0 = encoderXR;
       imuHeading0 = imuHeading;
       odoHeading0 = odoHeading;
+      globalHeading0 = globalHeading;
    }
 
    // average of two headings

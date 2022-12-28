@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -13,7 +14,7 @@ import org.firstinspires.ftc.teamcode.robot.Navigator;
 import org.firstinspires.ftc.teamcode.robot.Robot;
 
 @TeleOp(name = "3Odo_2022_v7_", group = "")
-//@Disabled
+@Disabled
 public class Odo_2022_v7 extends LinearOpMode {
 
     private ElapsedTime elapsedTime; // = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);

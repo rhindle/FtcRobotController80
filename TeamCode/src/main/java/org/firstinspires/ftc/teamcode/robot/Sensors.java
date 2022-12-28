@@ -93,5 +93,11 @@ public class Sensors {
       ledGREEN.setState(!readDistSensors);
    }
 
+   public void setLedRED(boolean boo) {
+      ledRED.setState(!boo);
+   }
 
+   public void setLedGREEN(boolean boo) {
+      ledGREEN.setState(!boo);
+   }
 }

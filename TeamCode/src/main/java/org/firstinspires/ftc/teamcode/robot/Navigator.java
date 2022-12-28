@@ -31,9 +31,11 @@ public class Navigator {
    long headingDelay = System.currentTimeMillis();
    long idleDelay = System.currentTimeMillis();
 
+   boolean onTargetByAccuracy = false;
+
    public double targetX, targetY, targetRot;
    public int navigate = 0;
-   boolean accurate = true;
+   int accurate = 1;  // 0 is loose, 1 is tight, more later?
    int navStep = 0;
    private ElapsedTime navTime = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
    int lastStep = 0;
@@ -121,7 +123,7 @@ public class Navigator {
          targetX=autoScript2[navStep].parameter1;
          targetY=autoScript2[navStep].parameter2;
          targetRot=autoScript2[navStep].parameter3;
-         accurate=true;
+         accurate=1;
          autoDrive();
       }
       // transitional position
@@ -129,7 +131,7 @@ public class Navigator {
          targetX=autoScript2[navStep].parameter1;
          targetY=autoScript2[navStep].parameter2;
          targetRot=autoScript2[navStep].parameter3;
-         accurate=false;
+         accurate=0;
          autoDrive();
       }
       // delay
@@ -189,11 +191,20 @@ public class Navigator {
       distance = Math.sqrt(Math.pow(deltaX,2) + Math.pow(deltaY,2));  // distance (error) from xy destination
 
       //exit criteria if destination has been adequately reached
-      if (accurate==false && distance<2) {  // no rotation component here
-         navStep++;
-         return;
+      onTargetByAccuracy = false;
+      if (accurate==0 && distance<2) {  // no rotation component here
+         onTargetByAccuracy = true;
       }
       if (distance<0.5 && Math.abs(deltaRot)<0.2) {
+         onTargetByAccuracy = true;
+      }
+      if (accurate==2 && distance<1 && Math.abs(deltaRot)<1) {
+         onTargetByAccuracy = true;
+      }
+      if (accurate==3 && distance<2 && Math.abs(deltaRot)<5) {  // ~ like 0 but still gets proportional
+         onTargetByAccuracy = true;
+      }
+      if (onTargetByAccuracy) {
          navStep++;
          return;
       }
@@ -201,7 +212,7 @@ public class Navigator {
       navAngle = Math.toDegrees(Math.atan2(deltaY,deltaX));  // angle to xy destination (vector when combined with distance)
       // linear proportional at 12", minimum 0.025
       pDist = Math.max(Math.min(distance/12,1),0.025);
-      if (accurate==false) pDist = 1;  // don't bother with proportional when hitting transitional destinations
+      if (accurate==0) pDist = 1;  // don't bother with proportional when hitting transitional destinations
       // linear proportional at 15°, minimum 0.025
       pRot = Math.max(Math.min(Math.abs(deltaRot)/15,1),0.025)*Math.signum(deltaRot)*-1;
 
@@ -305,6 +316,18 @@ public class Navigator {
       navigate=1;
    }
 
+   public void setAutoDrive(boolean boo) {
+      if (boo) navigate = 1; else navigate = 0;
+   }
+
+   public void setAccuracy(int A){
+      accurate = A;
+   }
+
+   public boolean isOnTargetByAccuracy() {
+      return onTargetByAccuracy;
+   }
+
    public void setTargetToZeroPosition() {
       targetX=0;
       targetY=0;
@@ -335,6 +358,19 @@ public class Navigator {
       storedHeading = localizer.returnGlobalHeading();
    }
 
+   public void setUseHeadingHold(boolean boo) {
+      useHeadingHold = boo;
+      storedHeading = localizer.returnGlobalHeading();
+   }
+
+   public void setUseHoldPosition(boolean boo) {
+      useHoldPosition = boo;
+   }
+
+   public void setUseAutoDistanceActivation(boolean boo) {
+      useAutoDistanceActivation = boo;
+   }
+
    public void togglePositionHold() {
       useHoldPosition = !useHoldPosition;
       if (useHoldPosition) setTargetToCurrentPosition();
@@ -348,6 +384,17 @@ public class Navigator {
       targetX += X;
       targetY += Y;
       targetRot += R;
+   }
+
+   public boolean setTargetAbsolute(double X, double Y, double R) {
+      // check if within bounds
+      //if (R < -180 || R > 180) return false;
+      if (X < -63 || X > 63) return false;  //63
+      if (Y < -63 || Y > 63) return false;  //63
+      targetX = X;
+      targetY = Y;
+      targetRot = Support.normalizeAngle(R);
+      return true;
    }
 
    public void setTargetRotBySnapRelative(double R) {

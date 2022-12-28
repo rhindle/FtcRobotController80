@@ -138,38 +138,9 @@ public class Robot {
 //        updateDistanceSensors();
     }
 
-//    public void readDistSensors (boolean boo) {
-//        readDistSensors = boo;
-//    }
-//    public void readDistSensors () {
-//        readDistSensors = !readDistSensors;
-//    }
-//
     private void updateImuHeading() {
         imuHeading =  imuHeading(true);
     }
-
-//    private void updateDistanceSensors() {
-//        if (readDistSensors) {
-//            switch (distCounter) {
-//                case 0:
-//                    distL = sensor2MLeft.getDistance(DistanceUnit.INCH);
-//                    break;
-//                case 1:
-//                    distM = sensor2MMiddle.getDistance(DistanceUnit.INCH);
-//                    break;
-//                case 2:
-//                    distR = sensor2MRight.getDistance(DistanceUnit.INCH);
-//                    break;
-//            }
-//            distCounter++;
-//            if (distCounter > 2) distCounter = 0;
-//        } else {
-//            distL = -1;
-//            distM = -1;
-//            distR = -1;
-//        }
-//    }
 
     private double imuHeading() {
         return imuHeading(false);

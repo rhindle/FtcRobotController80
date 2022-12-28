@@ -91,63 +91,6 @@ public class Odo_2022_v8 extends LinearOpMode {
         }
     }
 
-//    // Interpret user control inputs
-//    private void Controls() {
-//
-//        // Reset target navigation to present position
-//        if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.A))
-//            navigator.setTargetToCurrentPosition();
-//
-//        // This blob is for manually entering destinations by adjusting X, Y, Rot
-//        if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.dpadUP))
-//            navigator.setTargetByDelta((gamepad2.back ? 1 : tileSize/2.0),0,0);
-//        if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.dpadDOWN))
-//            navigator.setTargetByDelta(-(gamepad2.back ? 1 : tileSize/2.0),0,0);
-//        if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.dpadLEFT))
-//            navigator.setTargetByDelta(0, (gamepad2.back ? 1 : tileSize/2.0),0);
-//        if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.dpadRIGHT))
-//            navigator.setTargetByDelta(0, -(gamepad2.back ? 1 : tileSize/2.0),0);
-//        if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.X))
-//            navigator.setTargetByDelta(0,0,(gamepad2.back ? 2 : 45));
-//        if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.Y))
-//            navigator.setTargetByDelta(0,0,-(gamepad2.back ? 2 : 45));
-//
-//        // Toggle FCD
-//        if (buttonMgr.wasTapped(1, ButtonMgr.Buttons.START))
-//            navigator.toggleFieldCentricDrive();
-//
-//        // Toggle HeadingHold
-//        if (buttonMgr.wasTapped(1, ButtonMgr.Buttons.BACK))
-//            navigator.toggleHeadingHold();
-//
-//        // Start auto navigation
-//        if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.START))
-//            navigator.beginAutoDrive();
-//
-//        // Cancels auto navigation
-//        if (buttonMgr.isPressed(2, ButtonMgr.Buttons.B))
-//            navigator.cancelAutoNavigation();
-//
-//        // Set to home position
-//        if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.rightBUMPER))
-//            navigator.setTargetToZeroPosition();
-//
-//        // Begin scripted navigation
-//        if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.leftBUMPER))
-//            navigator.beginScriptedNav();
-//
-//        // Store heading correction
-//        if (buttonMgr.wasReleased(1, ButtonMgr.Buttons.rightJoyStickBUTTON))
-//            navigator.setDeltaHeading();
-//
-//        // Get speed and direction from left stick
-//        DriveSpeed = JavaUtil.minOfList(JavaUtil.createListWith(1, Support.mathHypotenuse(gamepad1.left_stick_x, gamepad1.left_stick_y)));
-//        DriveAngle = Math.atan2(-gamepad1.left_stick_x, -gamepad1.left_stick_y) / Math.PI * 180;
-//        // Get rotation from right stick
-//        Rotate = Math.pow(gamepad1.right_stick_x, 1);
-//        navigator.handleRotate(Rotate);
-//    }
-
     private void addTelemetryLoopStart() {
         telemetry.addData("Loop time (ms)", JavaUtil.formatNumber(calculateLoopTime(), 0));
         telemetry.addData("heading", JavaUtil.formatNumber(robot.returnImuHeading(),2));
@@ -190,8 +133,4 @@ public class Odo_2022_v8 extends LinearOpMode {
         return timeLoop;
     }
 
-//    // Hypotenuse function I used in Blocky?
-//    private double mathHypotenuse(float arg0, float arg1) {
-//        return Math.sqrt(Math.pow(arg0, 2) + Math.pow(arg1, 2));
-//    }
 }
