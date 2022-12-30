@@ -97,6 +97,10 @@ public class Odo_2022_v8 extends LinearOpMode {
         telemetry.addData("rangeL", String.format("%.01f in", robot.sensors.distL));
         telemetry.addData("rangeM", String.format("%.01f in", robot.sensors.distM));
         telemetry.addData("rangeR", String.format("%.01f in", robot.sensors.distR));
+//        telemetry.addData("raw__", localizer.odoRawPose.toString(2));
+//        telemetry.addData("robot", localizer.odoRobotPose.toString(2));
+//        telemetry.addData("final", localizer.odoFinalPose.toString(2));
+        robot.localizer.addTeleOpTelemetry();
     }
 
     private void addTelemetryLoopEnd() {

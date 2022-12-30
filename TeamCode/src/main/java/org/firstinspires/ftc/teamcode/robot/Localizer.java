@@ -22,6 +22,15 @@ public class Localizer {
    public double yPos, xPos;
    public boolean useFusedHeading = true;
 
+   Position odoRobotOffset = new Position (-2,0,0);     // map odo to robot (so it holds turn position better)
+   public Position odoFieldStart = new Position (-36,63,-90);  // field start position [blue right slot]
+
+   Position odoRawPose = new Position (0,0,0);          // original calculation of position before transforms applied
+   Position odoRobotPose = new Position ();                      // odo mapped to robot position (minor change)
+   Position odoFinalPose = new Position ();                          // odo mapped to field
+   Position odoFieldOffset = new Position ();                    // transform from initial position (more relevant for slamra!)
+   public Position robotPosition = new Position ();
+
    private static double eTicksPerInch = 82300 / 48;
    private static double eTicksPerRotate = 169619; //171500; //171738.8; //170000;
 
@@ -65,6 +74,16 @@ public class Localizer {
       odoHeading0 = getOdoHeading();
 
       globalHeading0 = imuHeading0;
+
+      /* example - was run after init
+      updateSlamraPosition();
+      setSlamraFieldOffset();
+      */
+
+      // odo start position is 0,0,0; imu should also read 0.  odoRawPose is already 0,0,0
+      updateOdoRobotPose();
+      setOdoFinalPose();
+      setOdoFieldOffset();
    }
 
    public void loop() {
@@ -81,6 +100,12 @@ public class Localizer {
       globalHeading = fusedHeading();
 
       updateXY();
+
+      odoRawPose = new Position(xPos, yPos, globalHeading);
+      updateOdoRobotPose();
+      setOdoFinalPose();
+      robotPosition = odoFinalPose.clone();
+
    }
 
    private double fusedHeading() {
@@ -184,5 +209,67 @@ public class Localizer {
       while (robotHeading <= -180) robotHeading += 360;
 
       return robotHeading;
+   }
+
+   //LK Slamra test functions - copied from Team's robot code
+   void updateOdoRobotPose() {
+      double sX, sY, sR, rX, rY, rR;
+      sX = odoRawPose.X;
+      sY = odoRawPose.Y;
+      sR = odoRawPose.R;
+      rX = odoRobotOffset.X;
+      rY = odoRobotOffset.Y;
+      rR = odoRobotOffset.R;
+      //x_robot*COS(RADIANS($C10))-y_robot*SIN(RADIANS($C10))
+      odoRobotPose.X = sX + (rX*Math.cos(Math.toRadians(sR)) - rY*Math.sin(Math.toRadians(sR)));
+      //=x_robot*SIN(RADIANS($C10))+y_robot*COS(RADIANS($C10))
+      odoRobotPose.Y = sY + (rX*Math.sin(Math.toRadians(sR)) + rY*Math.cos(Math.toRadians(sR)));
+      odoRobotPose.R = sR + rR;
+   }
+
+   // run this once at start after getting first robot pose
+   void setOdoFieldOffset() {
+      double fX, fY, fR, rX, rY, rR, sR;
+      if (odoFieldStart == null) {
+         fX = odoRobotPose.X;
+         fY = odoRobotPose.Y;
+         fR = odoRobotPose.R;
+      } else {
+         fX = odoFieldStart.X;
+         fY = odoFieldStart.Y;
+         fR = odoFieldStart.R;
+      }
+      rX = odoRobotPose.X;
+      rY = odoRobotPose.Y;
+      rR = odoRobotPose.R;
+      odoFieldOffset.R = fR - rR;
+      sR = odoFieldOffset.R;
+      //=M4*COS(RADIANS(r_field_slam))-N4*SIN(RADIANS(r_field_slam))  m4=rX, n4=rY
+      odoFieldOffset.X = fX - (rX*Math.cos(Math.toRadians(sR)) - rY*Math.sin(Math.toRadians(sR)));
+      //=M4*SIN(RADIANS(r_field_slam))+N4*COS(RADIANS(r_field_slam))
+      odoFieldOffset.Y = fY - (rX*Math.sin(Math.toRadians(sR)) + rY*Math.cos(Math.toRadians(sR)));
+   }
+
+   void setOdoFinalPose() {
+      //rotates slamra position to field coordinates & add offset
+      double oX, oY, oR, rX, rY, rR, sR;
+      rX = odoRobotPose.X;
+      rY = odoRobotPose.Y;
+      rR = odoRobotPose.R;
+      oX = odoFieldOffset.X;
+      oY = odoFieldOffset.Y;
+      oR = odoFieldOffset.R;
+      //=I11*COS(RADIANS(r_field_slam))-J11*SIN(RADIANS(r_field_slam))  i11=rX, j11=rY
+      odoFinalPose.X = (rX*Math.cos(Math.toRadians(oR)) - rY*Math.sin(Math.toRadians(oR))) + oX;
+      //=I11*SIN(RADIANS(r_field_slam))+J11*COS(RADIANS(r_field_slam))
+      odoFinalPose.Y = (rX*Math.sin(Math.toRadians(oR)) + rY*Math.cos(Math.toRadians(oR))) + oY;
+      odoFinalPose.R = rR + oR;
+   }
+//end LK test
+
+   public void addTeleOpTelemetry() {
+      telemetry.addData("raw__", odoRawPose.toString(2));
+      telemetry.addData("robot", odoRobotPose.toString(2));
+      telemetry.addData("final", odoFinalPose.toString(2));
    }
 }

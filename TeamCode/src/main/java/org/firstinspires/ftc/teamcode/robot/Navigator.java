@@ -16,6 +16,8 @@ public class Navigator {
    Localizer localizer;
    Drivetrain drivetrain;
 
+   Position robotPosition;
+
    public double v0, v2, v1, v3;
    double driveSpeed, driveAngle, rotate;
    double maxSpeed = 1;
@@ -56,6 +58,7 @@ public class Navigator {
       this.telemetry = robot.telemetry;
       this.localizer = robot.localizer;
       this.drivetrain = robot.drivetrain;
+      this.robotPosition = robot.localizer.robotPosition;
    }
 
    public void init() {
@@ -296,10 +299,11 @@ public class Navigator {
       double robotError;
       // calculate error in -179 to +180 range  (
       //robotError = targetAngle - getHeading();
-      robotError = targetAngle - robot.returnImuHeading();
-      while (robotError > 180)  robotError -= 360;
-      while (robotError <= -180) robotError += 360;
-      return robotError;
+//      robotError = targetAngle - robot.returnImuHeading();
+      robotError = targetAngle - localizer.returnGlobalHeading();
+//      while (robotError > 180)  robotError -= 360;
+//      while (robotError <= -180) robotError += 360;
+      return Support.normalizeAngle(robotError);
    }
 
    public void setMaxSpeed(double maxSpeed) {

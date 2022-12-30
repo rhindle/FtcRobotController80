@@ -104,10 +104,14 @@ public class Auto {
 
    private void addTelemetryLoopStart() {
       telemetry.addData("Loop time (ms)", JavaUtil.formatNumber(Support.calculateLoopTime(), 0));
-      telemetry.addData("heading", JavaUtil.formatNumber(robot.returnImuHeading(),2));
+      telemetry.addData("gl-heading", JavaUtil.formatNumber(robot.localizer.returnGlobalHeading(),2));
       telemetry.addData("rangeL", String.format("%.01f in", robot.sensors.distL));
       telemetry.addData("rangeM", String.format("%.01f in", robot.sensors.distM));
       telemetry.addData("rangeR", String.format("%.01f in", robot.sensors.distR));
+      //telemetry.addData("raw__", robot.localizer.odoRawPose.toString(2));
+      //telemetry.addData("robot", robot.localizer.odoRobotPose.toString(2));
+      //telemetry.addData("final", robot.localizer.odoFinalPose.toString(2));
+      robot.localizer.addTeleOpTelemetry();
    }
 
    private void addTelemetryLoopEnd() {
@@ -121,7 +125,7 @@ public class Auto {
       telemetry.addData("v1", JavaUtil.formatNumber(navigator.v2, 2));
       telemetry.addData("v2", JavaUtil.formatNumber(navigator.v1, 2));
       telemetry.addData("v3", JavaUtil.formatNumber(navigator.v3, 2));
-      telemetry.addData("rot about Z", JavaUtil.formatNumber(robot.returnImuHeading(), 2));
+      telemetry.addData("imu Heading", JavaUtil.formatNumber(robot.returnImuHeading(), 2));
       telemetry.addData("odo Heading", JavaUtil.formatNumber(robot.localizer.returnOdoHeading(), 2));
       telemetry.addData("Target X", navigator.targetX);
       telemetry.addData("Target Y", navigator.targetY);

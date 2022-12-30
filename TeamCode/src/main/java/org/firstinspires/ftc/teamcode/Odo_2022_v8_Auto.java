@@ -105,8 +105,15 @@ public class Odo_2022_v8_Auto extends LinearOpMode {
 
         //fake grab
         auto.driveTo(25.5,0,-90,3,2000); //rotate
-        auto.driveTo(25.5,-21.5,-90,2,2000);  //right
+        if (!auto.driveTo(25.5,-21.5,-90,2,4000)) {  //right
+            //auto.park();  // probably hung up somewhere - give up and attempt to park
+            return;
+        }
         auto.delay(1500);
+        if (elapsedTime.seconds() > 25) {
+            //auto.park();
+            return;
+        }
 
         //fake deposit
         auto.driveTo(25.5,0,-90,3,2000); // backup
