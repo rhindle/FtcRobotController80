@@ -18,6 +18,8 @@ public class Auto {
    Navigator2 navigator;
    public Controls controls;
 
+   double tileSide = 23.5;
+
    /* Constructor */
    public Auto(Robot robot){
       construct(robot);
@@ -40,10 +42,6 @@ public class Auto {
    public boolean driveTo(double X, double Y, double R, int accuracy) {
       return driveTo(X,Y,R,accuracy,0);
    }
-//    private void driveTo(double X, double Y, double R, long timeout) {
-//        driveTo(X,Y,R,1,timeout);
-//    }
-
    public boolean driveTo(double X, double Y, double R, int accuracy, long timeout) {
       boolean enableTimeout = true;
       boolean success = false;
@@ -68,6 +66,17 @@ public class Auto {
       navigator.setAutoDrive(false);
       navigator.setUseHoldPosition(success);  // hold the position only if it made it there!
       return success;
+   }
+
+   // this mess for tile-based drive positions
+   public boolean driveToTile(double X, double Y, double R) {
+      return driveTo(X * tileSide,Y * tileSide, R);
+   }
+   public boolean driveToTile(double X, double Y, double R, int accuracy) {
+      return driveTo(X * tileSide, Y * tileSide, R, accuracy);
+   }
+   public boolean driveToTile(double X, double Y, double R, int accuracy, long timeout) {
+      return driveTo(X * tileSide, Y * tileSide, R, accuracy, timeout);
    }
 
    public void delay(long ms) {

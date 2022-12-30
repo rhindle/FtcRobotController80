@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.JavaUtil;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.robot.Tools.Position;
 
 public class Navigator2 {
 
@@ -402,6 +403,7 @@ public class Navigator2 {
    }
 
    public void setTargetByDelta(double X, double Y, double R) {
+      //TODO: revamp this to account for field centric operation accounting for starting orientation
       targetX += X;
       targetY += Y;
       targetRot += R;

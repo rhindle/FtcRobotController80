@@ -8,6 +8,7 @@ import org.firstinspires.ftc.teamcode.robot.Auto;
 import org.firstinspires.ftc.teamcode.robot.ButtonMgr;
 import org.firstinspires.ftc.teamcode.robot.Navigator2;
 import org.firstinspires.ftc.teamcode.robot.Robot;
+import org.firstinspires.ftc.teamcode.robot.Tools.Position;
 
 @Autonomous(name = "3Odo_2022_v8_Auto", group = "")
 //@Disabled
@@ -50,6 +51,7 @@ public class Odo_2022_v8_Auto extends LinearOpMode {
         robot.init();
         robot.sensors.init();
         robot.drivetrain.init();
+        robot.localizer.odoFieldStart = new Position (-35.25,58.75,-90);  //needs to be set before navigator is inited
         navigator.init();
 
         while (!isStarted()) {
@@ -97,10 +99,76 @@ public class Odo_2022_v8_Auto extends LinearOpMode {
 //        driveTo(0,0,0,1,3000);
 
         //Starting point:  odoFieldStart = new Position (-36,63,-90);
+       // new Position (-35.25,58.75,-90);
 
         //auto.driveTo(23,0,0,3,2000);     //forward
-        auto.driveTo(-36,39,-90,1,2000);     //forward
 
+        auto.driveTo(-35.25,39.25,-90,3,2000);     //forward
+
+        //fake grab
+        auto.driveTo(-35.25,35.25,180,3,2000); //rotate
+        auto.driveTo(-58.75,35.25,180,2,2000);  //right
+        auto.delay(1500);
+
+        //fake deposit
+        auto.driveTo(-39.25,35.25,180,3,2000); // backup
+        auto.driveTo(-31.25,39.25,-135,2,2000); //rotate to position
+        auto.delay(2000);
+
+        //fake grab
+        auto.driveTo(-35.25,35.25,180,3,2000); //rotate
+        auto.driveTo(-58.75,35.25,180,2,2000);  //right
+        auto.delay(1500);
+
+        //fake deposit
+        auto.driveTo(-39.25,35.25,180,3,2000); // backup
+        auto.driveTo(-31.25,39.25,-135,2,2000); //rotate to position
+        auto.delay(2000);
+
+        //fake grab
+        auto.driveTo(-35.25,35.25,180,3,2000); //rotate
+        auto.driveTo(-58.75,35.25,180,2,2000);  //right
+        auto.delay(1500);
+
+        //return home
+        auto.driveTo(-58.75,35.25,-90,3,2000);  //rotate
+        auto.driveTo(-58.75,58.75,-90,3,2000);  //rotate
+        //delay(3000);
+        auto.driveTo(-35.25,58.75,-90,1,3000);  //strafe left
+/*        auto.driveTo(-35.25,35.25,-90,3,2000);     //forward
+
+        //fake grab
+        auto.driveTo(-35.25,35.25,180,3,2000); //rotate
+        auto.driveTo(-58.75,35.25,180,2,2000);  //right
+        auto.delay(1500);
+
+        //fake deposit
+        auto.driveTo(-35.25,35.25,180,3,2000); // backup
+        auto.driveTo(-31.25,39.25,-135,2,2000); //rotate to position
+        auto.delay(2000);
+
+        //fake grab
+        auto.driveTo(-35.25,35.25,180,3,2000); //rotate
+        auto.driveTo(-58.75,35.25,180,2,2000);  //right
+        auto.delay(1500);
+
+        //fake deposit
+        auto.driveTo(-35.25,35.25,180,3,2000); // backup
+        auto.driveTo(-31.25,39.25,-135,2,2000); //rotate to position
+        auto.delay(2000);
+
+        //fake grab
+        auto.driveTo(-35.25,35.25,180,3,2000); //rotate
+        auto.driveTo(-58.75,35.25,180,2,2000);  //right
+        auto.delay(1500);
+
+        //return home
+        auto.driveTo(-58.75,35.25,-90,3,2000);  //rotate
+        auto.driveTo(-58.75,58.75,-90,3,2000);  //rotate
+        //delay(3000);
+        auto.driveTo(-35.25,58.75,-90,1,3000);  //strafe left
+
+ */
 /*
         //fake grab
         auto.driveTo(25.5,0,-90,3,2000); //rotate

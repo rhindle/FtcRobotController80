@@ -128,14 +128,23 @@ public class Controls {
          navigator.setTargetToCurrentPosition();
 
       // This blob is for manually entering destinations by adjusting X, Y, Rot
-      if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.dpadUP))
-         navigator.setTargetByDelta((gamepad2.back ? 1 : tileSize/2.0),0,0);
-      if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.dpadDOWN))
-         navigator.setTargetByDelta(-(gamepad2.back ? 1 : tileSize/2.0),0,0);
+//      if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.dpadUP))
+//         navigator.setTargetByDelta((gamepad2.back ? 1 : tileSize/2.0),0,0);
+//      if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.dpadDOWN))
+//         navigator.setTargetByDelta(-(gamepad2.back ? 1 : tileSize/2.0),0,0);
+//      if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.dpadLEFT))
+//         navigator.setTargetByDelta(0, (gamepad2.back ? 1 : tileSize/2.0),0);
+//      if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.dpadRIGHT))
+//         navigator.setTargetByDelta(0, -(gamepad2.back ? 1 : tileSize/2.0),0);
       if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.dpadLEFT))
-         navigator.setTargetByDelta(0, (gamepad2.back ? 1 : tileSize/2.0),0);
+         navigator.setTargetByDelta((gamepad2.back ? 1 : tileSize/2.0),0,0);
       if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.dpadRIGHT))
-         navigator.setTargetByDelta(0, -(gamepad2.back ? 1 : tileSize/2.0),0);
+         navigator.setTargetByDelta(-(gamepad2.back ? 1 : tileSize/2.0),0,0);
+      if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.dpadUP))
+         navigator.setTargetByDelta(0, -(gamepad2.back ? 1 : tileSize/2.0),0);  //signs on these temporarily reversed until method fixed
+      if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.dpadDOWN))
+         navigator.setTargetByDelta(0, (gamepad2.back ? 1 : tileSize/2.0),0);
+
       if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.X))
          navigator.setTargetByDelta(0,0,(gamepad2.back ? 2 : 45));
       if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.Y))
