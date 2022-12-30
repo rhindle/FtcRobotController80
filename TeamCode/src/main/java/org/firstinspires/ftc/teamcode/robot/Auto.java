@@ -15,7 +15,7 @@ public class Auto {
 //   Gamepad gamepad2;
    Telemetry telemetry;
    Robot robot;
-   Navigator navigator;
+   Navigator2 navigator;
    public Controls controls;
 
    /* Constructor */

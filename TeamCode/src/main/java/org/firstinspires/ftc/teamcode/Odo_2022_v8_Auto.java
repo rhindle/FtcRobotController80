@@ -2,16 +2,11 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.robotcore.external.JavaUtil;
 import org.firstinspires.ftc.teamcode.robot.Auto;
 import org.firstinspires.ftc.teamcode.robot.ButtonMgr;
-import org.firstinspires.ftc.teamcode.robot.Controls;
-import org.firstinspires.ftc.teamcode.robot.Drivetrain;
-import org.firstinspires.ftc.teamcode.robot.Localizer;
-import org.firstinspires.ftc.teamcode.robot.Navigator;
+import org.firstinspires.ftc.teamcode.robot.Navigator2;
 import org.firstinspires.ftc.teamcode.robot.Robot;
 
 @Autonomous(name = "3Odo_2022_v8_Auto", group = "")
@@ -32,7 +27,7 @@ public class Odo_2022_v8_Auto extends LinearOpMode {
     public Robot robot;
 //    public Localizer localizer;
 //    public Drivetrain drivetrain;
-    public Navigator navigator;
+    public Navigator2 navigator;
 //    public Controls controls;
     public Auto auto;
 
@@ -101,8 +96,12 @@ public class Odo_2022_v8_Auto extends LinearOpMode {
 //        delay(3000);
 //        driveTo(0,0,0,1,3000);
 
-        auto.driveTo(23,0,0,3,2000);     //forward
+        //Starting point:  odoFieldStart = new Position (-36,63,-90);
 
+        //auto.driveTo(23,0,0,3,2000);     //forward
+        auto.driveTo(-36,39,-90,1,2000);     //forward
+
+/*
         //fake grab
         auto.driveTo(25.5,0,-90,3,2000); //rotate
         if (!auto.driveTo(25.5,-21.5,-90,2,4000)) {  //right
@@ -141,7 +140,7 @@ public class Odo_2022_v8_Auto extends LinearOpMode {
         auto.driveTo(0,-23,0,3,2000);         //back
         //delay(3000);
         auto.driveTo(0,0,0,1,3000);           //strafe left
-
+*/
     }
 
 }

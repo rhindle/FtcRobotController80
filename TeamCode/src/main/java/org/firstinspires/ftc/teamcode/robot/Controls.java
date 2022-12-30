@@ -13,7 +13,7 @@ public class Controls {
 //   Telemetry telemetry;
    Robot robot;
    ButtonMgr buttonMgr;
-   Navigator navigator;
+   Navigator2 navigator;
    public double DriveSpeed, DriveAngle, Rotate;
 
    public final double tileSize = 23.5;  //in inches

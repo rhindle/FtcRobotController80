@@ -22,7 +22,7 @@ public class Localizer {
    public double yPos, xPos;
    public boolean useFusedHeading = true;
 
-   Position odoRobotOffset = new Position (-2,0,0);     // map odo to robot (so it holds turn position better)
+   Position odoRobotOffset = new Position (2.25,0,0);     // map odo to robot (so it holds turn position better)
    public Position odoFieldStart = new Position (-36,63,-90);  // field start position [blue right slot]
 
    Position odoRawPose = new Position (0,0,0);          // original calculation of position before transforms applied
@@ -104,7 +104,10 @@ public class Localizer {
       odoRawPose = new Position(xPos, yPos, globalHeading);
       updateOdoRobotPose();
       setOdoFinalPose();
-      robotPosition = odoFinalPose.clone();
+      //robotPosition = odoFinalPose.clone();
+      robotPosition.X = odoFinalPose.X;
+      robotPosition.Y = odoFinalPose.Y;
+      robotPosition.R = odoFinalPose.R;
 
    }
 
