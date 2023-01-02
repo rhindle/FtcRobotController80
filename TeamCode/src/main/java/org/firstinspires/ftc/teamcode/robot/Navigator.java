@@ -4,14 +4,11 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.JavaUtil;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.robot.Tools.Functions;
 import org.firstinspires.ftc.teamcode.robot.Tools.Position;
 
 public class Navigator {
 
-//   LinearOpMode opMode;
-//   HardwareMap hardwareMap;
-//   Gamepad gamepad1;
-//   Gamepad gamepad2;
    Telemetry telemetry;
    Robot robot;
    Localizer localizer;
@@ -51,10 +48,6 @@ public class Navigator {
    }
 
    void construct(Robot robot){//}, Localizer localizer, Drivetrain drivetrain){
-//      this.opMode = opMode;
-//      this.hardwareMap = opMode.hardwareMap;
-//      this.gamepad1 = opMode.gamepad1;
-//      this.gamepad2 = opMode.gamepad2;
       this.robot = robot;
       this.telemetry = robot.telemetry;
       this.localizer = robot.localizer;
@@ -304,7 +297,7 @@ public class Navigator {
       robotError = targetAngle - localizer.returnGlobalHeading();
 //      while (robotError > 180)  robotError -= 360;
 //      while (robotError <= -180) robotError += 360;
-      return Support.normalizeAngle(robotError);
+      return Functions.normalizeAngle(robotError);
    }
 
    public void setMaxSpeed(double maxSpeed) {
@@ -398,7 +391,7 @@ public class Navigator {
       if (Y < -63 || Y > 63) return false;  //63
       targetX = X;
       targetY = Y;
-      targetRot = Support.normalizeAngle(R);
+      targetRot = Functions.normalizeAngle(R);
       return true;
    }
 

@@ -3,14 +3,12 @@ package org.firstinspires.ftc.teamcode.robot;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
 import org.firstinspires.ftc.robotcore.external.JavaUtil;
+import org.firstinspires.ftc.teamcode.robot.Tools.Functions;
 
 public class Controls {
 
-//   LinearOpMode opMode;
-//   HardwareMap hardwareMap;
    Gamepad gamepad1;
    Gamepad gamepad2;
-//   Telemetry telemetry;
    Robot robot;
    ButtonMgr buttonMgr;
    Navigator2 navigator;
@@ -24,10 +22,6 @@ public class Controls {
    }
 
    void construct(Robot robot){//ButtonMgr buttonMgr, Navigator navigator){
-//      this.opMode = opMode;
-//      this.hardwareMap = opMode.hardwareMap;
-
-//      this.telemetry = opMode.telemetry;
       this.robot = robot;
       this.gamepad1 = robot.opMode.gamepad1;
       this.gamepad2 = robot.opMode.gamepad2;
@@ -49,7 +43,7 @@ public class Controls {
       // TeleOp / normal drive
 
       // Get speed and direction from left stick
-      DriveSpeed = JavaUtil.minOfList(JavaUtil.createListWith(1, Support.mathHypotenuse(gamepad1.left_stick_x, gamepad1.left_stick_y)));
+      DriveSpeed = JavaUtil.minOfList(JavaUtil.createListWith(1, Functions.mathHypotenuse(gamepad1.left_stick_x, gamepad1.left_stick_y)));
       DriveAngle = Math.atan2(-gamepad1.left_stick_x, -gamepad1.left_stick_y) / Math.PI * 180;
       // Get rotation from right stick
       Rotate = Math.pow(gamepad1.right_stick_x, 1);

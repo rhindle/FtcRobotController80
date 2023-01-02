@@ -3,14 +3,11 @@ package org.firstinspires.ftc.teamcode.robot;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.robot.Tools.Functions;
 import org.firstinspires.ftc.teamcode.robot.Tools.Position;
 
 public class Localizer {
 
-//   LinearOpMode opMode;
-//   HardwareMap hardwareMap;
-//   Gamepad gamepad1;
-//   Gamepad gamepad2;
    Telemetry telemetry;
    Robot robot;
 
@@ -39,19 +36,11 @@ public class Localizer {
    //                          169748.4		169765		169067		169894		==>  169618.6
 
    /* Constructor */
-//   public Localizer(LinearOpMode opMode, Robot robot){
-//   public Localizer(LinearOpMode opMode, Robot robot){
-//      construct(opMode, robot);
-//   }
    public Localizer(Robot robot){
       construct(robot);
    }
 
    void construct(Robot robot){
-//      this.opMode = robot.opMode;
-//      this.hardwareMap = opMode.hardwareMap;
-//      this.gamepad1 = opMode.gamepad1;
-//      this.gamepad2 = opMode.gamepad2;
       this.robot = robot;
       this.telemetry = robot.telemetry;
    }
@@ -106,8 +95,8 @@ public class Localizer {
       updateOdoRobotPose();
       setOdoFinalPose();
       //robotPosition = odoFinalPose.clone();
-      robotPosition.X = odoFinalPose.X;
-      robotPosition.Y = odoFinalPose.Y;
+      robotPosition.X = odoFinalPose.X;   // done this way to not break the link back to Navigator
+      robotPosition.Y = odoFinalPose.Y;   // (creating a new object messes things up)
       robotPosition.R = odoFinalPose.R;
 
    }
@@ -116,15 +105,15 @@ public class Localizer {
       // don't fuse if the flag isn't set
       if (!useFusedHeading) return imuHeading;
       // use imuHeading if it's settled
-      if (Math.abs(Support.normalizeAngle(imuHeading - imuHeading0)) < 0.5) return imuHeading;
+      if (Math.abs(Functions.normalizeAngle(imuHeading - imuHeading0)) < 0.5) return imuHeading;
       // otherwise fuse it with odoHeading data
-      return Support.normalizeAngle(globalHeading0 + (odoHeading - odoHeading0));
+      return Functions.normalizeAngle(globalHeading0 + (odoHeading - odoHeading0));
    }
 
    private void showImuSettled() {
       // note that imuHeading0 and odoHeading0 are updated by updateXY(), so this comparison needs to happen first.
       double delta = imuHeading - imuHeading0;
-      delta = Support.normalizeAngle(delta);
+      delta = Functions.normalizeAngle(delta);
       if (useFusedHeading) {
          if (Math.abs(delta) < 0.5) robot.sensors.setLedGREEN(true);
          else robot.sensors.setLedGREEN(false);
@@ -144,9 +133,10 @@ public class Localizer {
       diffX = encoderXR - encoderXL;
       diffX = diffX % eTicksPerRotate;
       diffX = diffX / eTicksPerRotate * 360;
-      if (diffX > 180) diffX -= 360;
-      if (diffX < -180) diffX += 360;
-      return diffX;
+//      if (diffX > 180) diffX -= 360;
+//      if (diffX < -180) diffX += 360;
+//      return diffX;
+      return Functions.normalizeAngle(diffX);
    }
 
    public double returnOdoHeading() {
@@ -192,11 +182,14 @@ public class Localizer {
       double robotHeading;
 
       // find the difference between them
-      robotHeading = secondHeading - firstHeading;
+//      robotHeading = secondHeading - firstHeading;
 
       // based on sampling rate, assume large values wrapped
-      if (robotHeading > 180) robotHeading -= 360;
-      if (robotHeading <= -180) robotHeading += 360;
+//      if (robotHeading > 180) robotHeading -= 360;
+//      if (robotHeading <= -180) robotHeading += 360;
+
+      // find the difference between them ; based on sampling rate, assume large values wrapped
+      robotHeading = Functions.normalizeAngle(secondHeading - firstHeading);
 
       robotHeading /= 2;
 
@@ -209,10 +202,46 @@ public class Localizer {
         robotHeading = (secondHeading + firstHeading) / 2; */
 
       // then recalculate to -179 to +180 range
-      while (robotHeading > 180)  robotHeading -= 360;
-      while (robotHeading <= -180) robotHeading += 360;
+//      while (robotHeading > 180)  robotHeading -= 360;
+//      while (robotHeading <= -180) robotHeading += 360;
+//
+//      return robotHeading;
+      return Functions.normalizeAngle(robotHeading);
+   }
 
-      return robotHeading;
+
+   void updateOdoRobotPose2() {
+      //pos1 = odoRawPose
+      //pos2 = odoRobotOffset
+      odoRobotPose = transformPosition(odoRawPose, odoRobotOffset);
+   }
+   void setOdoFinalPose2() {
+      //pos1 = odoFieldOffset
+      //pos2 = odoRobotPose
+      odoFinalPose = transformPosition(odoFieldOffset, odoRobotPose);
+   }
+   void setOdoFieldOffset2() {
+      //void setOdoFieldOffset2(Position fS, Position rP) {
+      //fS = odoFieldStart
+      //rP = odoRobotPose
+      //odoFieldOffset.X = fS.X - (rP.X*Math.cos(Math.toRadians(offsetR)) - rP.Y*Math.sin(Math.toRadians(offsetR)));
+      //odoFieldOffset.Y = fS.Y - (rP.X*Math.sin(Math.toRadians(offsetR)) + rP.Y*Math.cos(Math.toRadians(offsetR)));
+      //odoFieldOffset.R = offsetR;
+      Position fS = odoFieldStart;
+      Position rP = odoRobotPose;
+      double offsetR = fS.R - rP.R;
+      odoFieldOffset = new Position (
+              (fS.X - (rP.X*Math.cos(Math.toRadians(offsetR)) - rP.Y*Math.sin(Math.toRadians(offsetR)))),
+              (fS.Y - (rP.X*Math.sin(Math.toRadians(offsetR)) + rP.Y*Math.cos(Math.toRadians(offsetR)))),
+              (offsetR)
+      );
+   }
+   Position transformPosition(Position pos1, Position pos2) {
+      return new Position(
+              (pos1.X + (pos2.X*Math.cos(Math.toRadians(pos1.R)) - pos2.Y*Math.sin(Math.toRadians(pos1.R)))),
+              (pos1.Y + (pos2.X*Math.sin(Math.toRadians(pos1.R)) + pos2.Y*Math.cos(Math.toRadians(pos1.R)))),
+              (pos1.R + pos2.R)
+      );
    }
 
    //LK Slamra test functions - copied from Team's robot code

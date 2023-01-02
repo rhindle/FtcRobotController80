@@ -1,18 +1,12 @@
 package org.firstinspires.ftc.teamcode.robot;
 
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.Gamepad;
-import com.qualcomm.robotcore.hardware.HardwareMap;
-
 import org.firstinspires.ftc.robotcore.external.JavaUtil;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.robot.Tools.Functions;
+import org.firstinspires.ftc.teamcode.robot.Tools.Position;
 
 public class Auto {
 
-//   LinearOpMode opMode;
-//   HardwareMap hardwareMap;
-//   Gamepad gamepad1;
-//   Gamepad gamepad2;
    Telemetry telemetry;
    Robot robot;
    Navigator2 navigator;
@@ -26,10 +20,6 @@ public class Auto {
    }
 
    void construct(Robot robot){
-//      this.opMode = opMode;
-//      this.hardwareMap = opMode.hardwareMap;
-//      this.gamepad1 = opMode.gamepad1;
-//      this.gamepad2 = opMode.gamepad2;
       this.robot = robot;
       this.telemetry = robot.opMode.telemetry;
       this.navigator = robot.navigator;
@@ -41,6 +31,9 @@ public class Auto {
    }
    public boolean driveTo(double X, double Y, double R, int accuracy) {
       return driveTo(X,Y,R,accuracy,0);
+   }
+   public boolean driveTo(Position pos, int accuracy, long timeout) {
+      return driveTo(pos.X, pos.Y, pos.R, accuracy, timeout);
    }
    public boolean driveTo(double X, double Y, double R, int accuracy, long timeout) {
       boolean enableTimeout = true;
@@ -78,6 +71,9 @@ public class Auto {
    public boolean driveToTile(double X, double Y, double R, int accuracy, long timeout) {
       return driveTo(X * tileSide, Y * tileSide, R, accuracy, timeout);
    }
+   public boolean driveToTile(Position pos, int accuracy, long timeout) {
+      return driveTo(pos.X * tileSide, pos.Y * tileSide, pos.R, accuracy, timeout);
+   }
 
    public void delay(long ms) {
       delay(ms,false);
@@ -97,8 +93,8 @@ public class Auto {
    public void robotLoop() {
       if (robot.opMode.opModeIsActive()) {
          robot.loop();               // Clears bulk data and reads IMU
-         robot.buttonMgr.loop();           // Processes digital controller input
-         robot.localizer.loop();           // Updates odometry X, Y, Rotation
+         robot.buttonMgr.loop();     // Processes digital controller input
+         robot.localizer.loop();     // Updates odometry X, Y, Rotation
          robot.sensors.loop();       // Update distance sensors, etc.
 
          addTelemetryLoopStart();
@@ -112,7 +108,7 @@ public class Auto {
    }
 
    private void addTelemetryLoopStart() {
-      telemetry.addData("Loop time (ms)", JavaUtil.formatNumber(Support.calculateLoopTime(), 0));
+      telemetry.addData("Loop time (ms)", JavaUtil.formatNumber(Functions.calculateLoopTime(), 0));
       telemetry.addData("gl-heading", JavaUtil.formatNumber(robot.localizer.returnGlobalHeading(),2));
       telemetry.addData("rangeL", String.format("%.01f in", robot.sensors.distL));
       telemetry.addData("rangeM", String.format("%.01f in", robot.sensors.distM));

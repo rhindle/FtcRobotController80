@@ -1,9 +1,7 @@
 package org.firstinspires.ftc.teamcode.robot;
 
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
-import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -11,10 +9,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 public class Sensors {
 
-//   LinearOpMode opMode;
    HardwareMap hardwareMap;
-//   Gamepad gamepad1;
-//   Gamepad gamepad2;
    Telemetry telemetry;
    Robot robot;
 
@@ -34,10 +29,6 @@ public class Sensors {
    }
 
    void construct(Robot robot){
-//      this.opMode = opMode;
-//      this.hardwareMap = opMode.hardwareMap;
-//      this.gamepad1 = opMode.gamepad1;
-//      this.gamepad2 = opMode.gamepad2;
       this.robot = robot;
       this.telemetry = robot.telemetry;
       this.hardwareMap = robot.hardwareMap;

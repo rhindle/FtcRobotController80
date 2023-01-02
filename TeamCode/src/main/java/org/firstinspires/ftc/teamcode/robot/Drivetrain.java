@@ -6,10 +6,6 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class Drivetrain {
 
-//    LinearOpMode opMode;
-//    HardwareMap hardwareMap;
-//    Gamepad gamepad1;
-//    Gamepad gamepad2;
     Telemetry telemetry;
     Robot robot;
 
@@ -21,10 +17,6 @@ public class Drivetrain {
     }
 
     void construct(Robot robot){
-//        this.opMode = opMode;
-//        this.hardwareMap = opMode.hardwareMap;
-//        this.gamepad1 = opMode.gamepad1;
-//        this.gamepad2 = opMode.gamepad2;
         this.robot = robot;
         this.telemetry = robot.telemetry;
     }

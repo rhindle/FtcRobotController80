@@ -2,17 +2,15 @@ package org.firstinspires.ftc.teamcode.robot;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.Gamepad;
-import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class ButtonMgr {
 
     public LinearOpMode opMode;
-//    public HardwareMap hardwareMap;
     public Gamepad gamepad1;
     public Gamepad gamepad2;
-    private Telemetry telemetry;
+//    private Telemetry telemetry;
 
     public Object[] controlList = {};  //Object
     public ControlData[] controlData;
@@ -26,10 +24,9 @@ public class ButtonMgr {
 
     void construct(LinearOpMode opMode){
         this.opMode = opMode;
-//        this.hardwareMap = opMode.hardwareMap;
         this.gamepad1 = opMode.gamepad1;
         this.gamepad2 = opMode.gamepad2;
-        this.telemetry = opMode.telemetry;
+//        this.telemetry = opMode.telemetry;
 
         //allocate for # objects based on GPbuttons enum
         controlData = new ControlData[Buttons.values().length * 2];
