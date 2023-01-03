@@ -9,6 +9,7 @@ import org.firstinspires.ftc.teamcode.robot.ButtonMgr;
 import org.firstinspires.ftc.teamcode.robot.Navigator2;
 import org.firstinspires.ftc.teamcode.robot.Robot;
 import org.firstinspires.ftc.teamcode.robot.Tools.Position;
+import org.firstinspires.ftc.teamcode.robot.Tools.Functions;
 
 @Autonomous(name = "3Odo_2022_v8_Auto2", group = "")
 //@Disabled
@@ -23,6 +24,9 @@ public class Odo_2022_v8_Auto2 extends LinearOpMode {
     public Auto auto;
 
     boolean home = true;
+
+    boolean isBlueAlliance = true;
+    boolean isRightSide = true;
 
     @Override
     public void runOpMode() {
@@ -42,21 +46,35 @@ public class Odo_2022_v8_Auto2 extends LinearOpMode {
             robot.buttonMgr.loop();
             if (robot.buttonMgr.wasTapped(1, ButtonMgr.Buttons.A))
                 robot.localizer.toggleUseFusedHeading();
-            if (robot.buttonMgr.wasTapped(1, ButtonMgr.Buttons.B))
+            if (robot.buttonMgr.wasTapped(1, ButtonMgr.Buttons.Y))
                 home = !home;
+            if (robot.buttonMgr.wasTapped(1, ButtonMgr.Buttons.dpadLEFT))
+                isRightSide = false;
+            if (robot.buttonMgr.wasTapped(1, ButtonMgr.Buttons.dpadRIGHT))
+                isRightSide = true;
+            if (robot.buttonMgr.wasTapped(1, ButtonMgr.Buttons.X))
+                isBlueAlliance = true;
+            if (robot.buttonMgr.wasTapped(1, ButtonMgr.Buttons.B))
+                isBlueAlliance = false;
+
+
             telemetry.addData(">", "Press Play to start");
             telemetry.addData(">", "Robot Heading = %.1f", robot.returnImuHeading(true));
             telemetry.addData("Heading Type:", robot.localizer.useFusedHeading ? "FUSED/HYBRID" : "IMU ONLY");
             telemetry.addData("Test Type:", home ? "Home" : "Kroon");
+            telemetry.addData("Alliance:", isBlueAlliance ? "BLUE" : "RED");
+            telemetry.addData("Left/Right:", isRightSide ? "RIGHT" : "LEFT");
             telemetry.update();
             sleep(100);
         }
 
         if (home) {
-            robot.localizer.odoFieldStart = new Position(-35.25, 58.75, -90);  //needs to be set before navigator is inited
+            robot.localizer.odoFieldStart = modifyPosition(new Position(-35.25, 58.75, -90));  //needs to be set before navigator is inited
         } else {
             //Vector3(-1.5,2.68,90) = -35.25, 62.98, 90
-            robot.localizer.odoFieldStart = new Position(-35.25, 63, 90);  //needs to be set before navigator is inited
+            robot.localizer.odoFieldStart = modifyPosition(new Position(-35.25, 63, 90));  //needs to be set before navigator is inited
+            //for testing at home...  comment next line out!
+            //robot.localizer.odoFieldStart = modifyPosition(new Position(-35.25, 35.25, 90));  //needs to be set before navigator is inited
         }
         navigator.init();
 
@@ -90,37 +108,37 @@ public class Odo_2022_v8_Auto2 extends LinearOpMode {
         DriveToData dtdGrabToHome    = new DriveToData(new Position(-58.75, 35.25, -90), 3,2000);
         DriveToData dtdGrabToHome2   = new DriveToData(new Position(-58.75, 58.75, -90), 3, 2000);
 
-        auto.driveTo(posFirstStop, 3, 2000);     //forward
+        driveToPosition(posFirstStop, 3, 2000);     //forward
 
         //fake grab
-        auto.driveTo(posPostDropPreGrab, 3, 2000); //rotate
+        driveToPosition(posPostDropPreGrab, 3, 2000); //rotate
         driveToPosition(dtdStackGrab);
         auto.delay(1500);
 
         //fake deposit
-        auto.driveTo(posPreDrop, 3, 2000); // backup
+        driveToPosition(posPreDrop, 3, 2000); // backup
         driveToPosition(dtdDrop);
         auto.delay(2000);
 
         //fake grab
-        auto.driveTo(posPostDropPreGrab, 3, 2000); //rotate
+        driveToPosition(posPostDropPreGrab, 3, 2000); //rotate
         driveToPosition(dtdStackGrab);
         auto.delay(1500);
 
         //fake deposit
-        auto.driveTo(posPreDrop, 3, 2000); // backup
+        driveToPosition(posPreDrop, 3, 2000); // backup
         driveToPosition(dtdDrop);
         auto.delay(2000);
 
         //fake grab
-        auto.driveTo(posPostDropPreGrab, 3, 2000); //rotate
+        driveToPosition(posPostDropPreGrab, 3, 2000); //rotate
         driveToPosition(dtdStackGrab);
         auto.delay(1500);
 
         //return home
         driveToPosition(dtdGrabToHome);
         driveToPosition(dtdGrabToHome2);
-        auto.driveTo(robot.localizer.odoFieldStart, 1, 3000);  //strafe left
+        driveToPosition(modifyPosition(robot.localizer.odoFieldStart), 1, 3000);  //strafe left
 
     }
 
@@ -159,30 +177,75 @@ public class Odo_2022_v8_Auto2 extends LinearOpMode {
         DriveToData bluTallPrep180 = new DriveToData(true, new Position(-1.5,0.5,180),3,2000);
         DriveToData bluStackPrep   = new DriveToData(true, new Position(-2.2,0.5,180),3,2000);
         DriveToData bluStack       = new DriveToData(true, new Position(-2.5,0.5,180),2,2000);
+        DriveToData bluPark        = new DriveToData(true, new Position(-1.5,0.5,-90),1,2000);
 
         driveToPosition(bluLoadedPrep);
         driveToPosition(bluTall);
-        driveToPosition(bluTallPrep);
+        auto.delay(1000);
+
+        //driveToPosition(bluTallPrep);
         driveToPosition(bluTallPrep180);
-        driveToPosition(bluStackPrep);
+        //driveToPosition(bluStackPrep);
         driveToPosition(bluStack);
+        auto.delay(1000);
+
         driveToPosition(bluTallPrep180);
         driveToPosition(bluTall);
-        driveToPosition(bluTallPrep);
+        auto.delay(1000);
+
+        //driveToPosition(bluTallPrep);
         driveToPosition(bluTallPrep180);
-        driveToPosition(bluStackPrep);
+        //driveToPosition(bluStackPrep);
         driveToPosition(bluStack);
+        auto.delay(1000);
+
         driveToPosition(bluTallPrep180);
         driveToPosition(bluTall);
+        auto.delay(1000);
+
+        //driveToPosition(bluTallPrep);
+        driveToPosition(bluTallPrep180);
+        //driveToPosition(bluStackPrep);
+        driveToPosition(bluStack);
+        auto.delay(1000);
+
+        driveToPosition(bluTallPrep180);
+        driveToPosition(bluTall);
+        auto.delay(1000);
+
+        //Park
+        driveToPosition(bluTallPrep180);
+        driveToPosition(bluPark);
 
     }
 
+    Position modifyPosition (Position pos) {
+        //modify coordinates depending on robot position
+        if (isBlueAlliance && isRightSide)   // BLUE-RIGHT
+            return pos;
+        if (isBlueAlliance && !isRightSide)  // BLUE-LEFT
+            return new Position(-pos.X, pos.Y, Functions.normalizeAngle(-pos.R+180));
+        if (!isBlueAlliance && !isRightSide) // RED-LEFT
+            return new Position(pos.X, -pos.Y, -pos.R);
+        if (!isBlueAlliance && isRightSide)  // RED-RIGHT
+            return new Position(-pos.X, -pos.Y, Functions.normalizeAngle(pos.R+180));
+        return null;
+    }
+
     boolean driveToPosition (DriveToData dTD) {
+        //robot.drivetrain.stopDriveMotors();  // for debugging reasons
+        //modify coordinates depending on robot position
+        Position modPos = modifyPosition(dTD.position);
+        //dTD.position = modifyPosition(dTD.position);
+
         if (!dTD.tileCoord) {
-            return auto.driveTo(dTD.position, dTD.accuracy, dTD.timeout);
+            return auto.driveTo(modPos, dTD.accuracy, dTD.timeout);
         } else {
-            return auto.driveToTile(dTD.position, dTD.accuracy, dTD.timeout);
+            return auto.driveToTile(modPos, dTD.accuracy, dTD.timeout);
         }
+    }
+    boolean driveToPosition (Position pos, int accuracy, long timeout) {
+        return driveToPosition(new DriveToData(pos, accuracy, timeout));
     }
 
     class DriveToData {

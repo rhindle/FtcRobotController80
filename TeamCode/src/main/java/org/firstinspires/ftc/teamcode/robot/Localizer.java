@@ -71,9 +71,9 @@ public class Localizer {
       */
 
       // odo start position is 0,0,0; imu should also read 0.  odoRawPose is already 0,0,0
-      updateOdoRobotPose();
-      setOdoFinalPose();
-      setOdoFieldOffset();
+      updateOdoRobotPose2();
+      setOdoFinalPose2();
+      setOdoFieldOffset2();
    }
 
    public void loop() {
@@ -92,8 +92,8 @@ public class Localizer {
       updateXY();
 
       odoRawPose = new Position(xPos, yPos, globalHeading);
-      updateOdoRobotPose();
-      setOdoFinalPose();
+      updateOdoRobotPose2();
+      setOdoFinalPose2();
       //robotPosition = odoFinalPose.clone();
       robotPosition.X = odoFinalPose.X;   // done this way to not break the link back to Navigator
       robotPosition.Y = odoFinalPose.Y;   // (creating a new object messes things up)
