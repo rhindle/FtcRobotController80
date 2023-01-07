@@ -176,7 +176,7 @@ public class Odo_2022_v8_Auto2 extends LinearOpMode {
         DriveToData bluTallPrep    = new DriveToData(true, new Position(-1.5,0.5,135),3,2000);
         DriveToData bluTallPrep180 = new DriveToData(true, new Position(-1.5,0.5,180),3,2000);
         DriveToData bluStackPrep   = new DriveToData(true, new Position(-2.2,0.5,180),3,2000);
-        DriveToData bluStackAvoid  = new DriveToData(true, new Position(-2.0,0.7,180),3,2000);
+        DriveToData bluStackAvoid  = new DriveToData(true, new Position(-2.0,0.6,180),3,2000);
         DriveToData bluStack       = new DriveToData(true, new Position(-2.5,0.5,180),2,2000);
         DriveToData bluPark        = new DriveToData(true, new Position(-1.5,0.5,-90),1,2000);
 

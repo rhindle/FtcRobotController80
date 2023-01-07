@@ -30,6 +30,8 @@ public class Robot {
 //    public Gamepad gamepad2;
 //    private Telemetry telemetry;
 
+    public boolean useODO = true;
+
     public ButtonMgr buttonMgr;
     public Localizer localizer;
     public Drivetrain drivetrain;

@@ -46,6 +46,13 @@ public class Localizer {
    }
 
    public void init() {
+      if (!robot.useODO) {
+         //imuHeading0 = robot.returnImuHeading(true);
+         //globalHeading0 = imuHeading0;
+         robotPosition.X = 0;   // done this way to not break the link back to Navigator
+         robotPosition.Y = 0;
+         return;
+      }
       odoY = robot.motor0B;
       odoXR = robot.motor1B;
       odoXL = robot.motor2B;
@@ -77,6 +84,12 @@ public class Localizer {
    }
 
    public void loop() {
+      if (!robot.useODO) {
+         imuHeading = robot.returnImuHeading();
+         globalHeading = imuHeading;
+         robotPosition.R = globalHeading;
+         return;
+      }
       encoderY = odoY.getCurrentPosition();
       encoderXL = odoXL.getCurrentPosition();
       encoderXR = odoXR.getCurrentPosition();

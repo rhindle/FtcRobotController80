@@ -72,6 +72,12 @@ public class Navigator2 {
 
    public void loop() {
 
+      if (!robot.useODO) {
+         userDrive();
+         drivetrain.setDrivePowers(v0, v1, v2, v3);
+         return;
+      }
+
       // State machine-ish.  Needs embetterment.  This will determine motor powers then set them
       if (navigate == 1) {
          autoDrive();
