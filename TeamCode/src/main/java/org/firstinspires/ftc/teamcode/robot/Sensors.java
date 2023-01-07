@@ -19,6 +19,8 @@ public class Sensors {
    public DigitalChannel ledRED = null;
    public DigitalChannel ledGREEN = null;
 
+   public DigitalChannel switch0B = null;
+
    public double distL, distM, distR;
    private int distCounter = 0;
    private boolean readDistSensors = false;
@@ -44,6 +46,9 @@ public class Sensors {
       ledGREEN.setMode(DigitalChannel.Mode.OUTPUT);
       ledRED.setState(true);
       ledGREEN.setState(true);
+
+      switch0B = hardwareMap.get(DigitalChannel.class, "digital0B");
+      switch0B.setMode(DigitalChannel.Mode.INPUT);
    }
 
    public void loop(){
@@ -90,5 +95,9 @@ public class Sensors {
 
    public void setLedGREEN(boolean boo) {
       ledGREEN.setState(!boo);
+   }
+
+   public boolean getSwitch0B() {
+      return switch0B.getState();
    }
 }
