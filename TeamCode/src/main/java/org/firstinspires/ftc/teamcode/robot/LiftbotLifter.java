@@ -18,6 +18,7 @@ public class LiftbotLifter {
     long safeToOpenTime = System.currentTimeMillis();
 
     double grabOpenRequested = -1;
+    boolean deferredHold = false;
     double liftPositionRequested = -1;
     int stateMachineType = -1;
     int stateMachineStep = -1;
@@ -25,6 +26,9 @@ public class LiftbotLifter {
     long stateMachineTaskLimit = System.currentTimeMillis();
     long stateMachineDelay = System.currentTimeMillis();
     boolean liftHomed = false;
+    double userLiftSpeed = 0;
+    boolean isUnderManualControl = false;
+    int stackedCone = 5;
 
     //turn servos
     final double turnServoMinPosition       = 0.064;
@@ -79,6 +83,7 @@ public class LiftbotLifter {
     public void loop() {
         stateMachineMgr();
         delayedServoActions();
+        spamTelemetry();
     }
 
     public void startStateMachine(int machine) {
@@ -170,6 +175,7 @@ public class LiftbotLifter {
 
         if (stateMachineStep == 1) {                 // send it down
             if (!isLimitSwitchPressed()) {           // go down if not already pressing switch
+                zeroLiftEncoders();
                 setLiftHeight(-1000,0.25);
             }
             stateMachineStep++;
@@ -211,7 +217,8 @@ public class LiftbotLifter {
         }
         if (stateMachineStep == 2) {         // if the grabber is closed, safe to move the arm up (if it isn't already over)
             if (isStateMachineDelayFinished()) {
-                if (whereIsArm()!=turnServoDepositPos) {   // if arm not already over pole, go straight up
+//                if (whereIsArm()!=turnServoDepositPos) {   // if arm not already over pole, go straight up
+                if (!isServoAtPosition(whereIsArm(), turnServoDepositPos)) {
                     action(LiftActions.ARM_UP);
                 }
                 stateMachineStep++;
@@ -219,7 +226,8 @@ public class LiftbotLifter {
         }
         if (stateMachineStep == 3) {         // wait for lift to be in position and move arm level
             if (isLiftInTolerance()) {
-                if (whereIsArm()!=turnServoDepositPos) {
+//                if (whereIsArm()!=turnServoDepositPos) {
+                if (!isServoAtPosition(whereIsArm(), turnServoDepositPos)) {
                     action(LiftActions.ARM_POLE);
                     stateMachineDelay = System.currentTimeMillis() + 500;
                 }
@@ -242,9 +250,14 @@ public class LiftbotLifter {
         if (cancelStateMachine()) return;
 
         if (stateMachineStep == 1) {
-            action(LiftActions.GRAB_CLOSE);   // close the grabber and set a delay time for the lift
-            stateMachineDelay = System.currentTimeMillis() + 500;
-            stateMachineStep++;
+            if (isServoAtPosition(servoGrab, grabberServoClosePos) || !isServoAtPosition(servoLeft, turnServoGrabPos)) {
+                // if the grabber is already closed or the arm is not in the grab position, don't bother
+                stateMachineStep = 4;  // skip to the end
+            } else {
+                action(LiftActions.GRAB_CLOSE);   // close the grabber and set a delay time for the lift
+                stateMachineDelay = System.currentTimeMillis() + 500;
+                stateMachineStep++;
+            }
         }
         if (stateMachineStep == 2) {         // wait for grab to be closed and raise lift
             if (isStateMachineDelayFinished()) {
@@ -293,7 +306,7 @@ public class LiftbotLifter {
     }
 
     public boolean isLimitSwitchPressed() {
-        return robot.sensors.getSwitch0B();
+        return !robot.sensors.getSwitch0B();
     }
 
     public boolean isLiftInTolerance(int pos) {
@@ -310,7 +323,8 @@ public class LiftbotLifter {
     }
 
     public boolean isGrabServoClosed () {
-        return (servoGrab.getPosition()==grabberServoClosePos);
+        //return (servoGrab.getPosition()==grabberServoClosePos);
+        return isServoAtPosition(servoGrab, grabberServoClosePos);
     }
 
     public boolean isStateMachineDelayFinished() {
@@ -319,6 +333,14 @@ public class LiftbotLifter {
 
     public double whereIsArm() {
         return (servoLeft.getPosition());
+    }
+
+    public boolean isServoAtPosition(Servo servo, double comparePosition) {
+        return isServoAtPosition(servo.getPosition(), comparePosition);
+    }
+
+    public boolean isServoAtPosition(double servoPosition, double comparePosition) {
+        return(Math.round(servoPosition*100.0) == Math.round(comparePosition*100.0));
     }
 
     public void setDrivePowers (double m0) {
@@ -367,7 +389,8 @@ public class LiftbotLifter {
     }
 
     public void setVFBservos (double goTo) {
-        if (servoLeft.getPosition()!=goTo) {
+//        if (servoLeft.getPosition()!=goTo) {
+        if (!isServoAtPosition(servoLeft, goTo)) {
             action(LiftActions.GRAB_CLOSE);
             servoLeft.setPosition(goTo);
             servoRight.setPosition(goTo + rightTurnServoOffset);
@@ -377,11 +400,21 @@ public class LiftbotLifter {
 
     public void delayedServoActions () {
         if (grabOpenRequested!=-1) setGrabServo(grabOpenRequested);  // simple handling of delayed servo opening
+        if (deferredHold) {
+            stopMotorsAndHold();
+            deferredHold = false;
+        };
+    }
+
+    public void toggleGrabServo () {
+        if (isGrabServoClosed()) action(LiftActions.GRAB_OPEN);
+        else action(LiftActions.GRAB_CLOSE);
     }
 
     public void setGrabServo (double goTo) {
         grabOpenRequested = -1;
-        if (servoGrab.getPosition()!=goTo) {
+//        if (servoGrab.getPosition()!=goTo) {
+        if (!isServoAtPosition(servoGrab, goTo)) {
             if (goTo == grabberServoClosePos) {   // Closing should always be safe
                 servoGrab.setPosition(goTo);
             } else if (isGrabberSafeToOpen()) {   // Opening is safe if enough time has passed
@@ -390,6 +423,14 @@ public class LiftbotLifter {
                 grabOpenRequested = goTo;         // for delayed opening
             }
         }
+    }
+
+    public void cycleConeStack() {
+        //first check if the grabber and arm are in suitable positions (not closed, in grab position)
+        if (isServoAtPosition(servoGrab, grabberServoClosePos) || !isServoAtPosition(servoLeft, turnServoGrabPos)) return;
+        stackedCone--;
+        if (stackedCone < 0) stackedCone = 4;
+        setLiftHeight(stackHeight[stackedCone],0.5);
     }
 
 //    public void actionGrab() {setGrabServo(grabberServoClosePos);}
@@ -406,6 +447,9 @@ public class LiftbotLifter {
                 break;
             case GRAB_CLOSE:
                 setGrabServo(grabberServoClosePos);
+                break;
+            case GRAB_TOGGLE:
+                toggleGrabServo();
                 break;
             case ARM_FLOOR:
                 setVFBservos(turnServoGrabPos);
@@ -424,6 +468,9 @@ public class LiftbotLifter {
                 break;
             case LIFT_RAISE_AFTER_CAPTURE:
                 setLiftHeight(liftTargetPosition+grabClearance, 0.5);
+                break;
+            case LIFT_DOWNSTACK:
+                cycleConeStack();
                 break;
             case AUTOMATE_CAPTURE:
                 startStateMachine(action);
@@ -444,6 +491,7 @@ public class LiftbotLifter {
                 startStateMachine(action);
                 break;
             case CANCEL:
+                stopStateMachine();
                 stopMotors();
                 grabOpenRequested = -1;
                 break;
@@ -476,12 +524,14 @@ public class LiftbotLifter {
         GRAB_OPEN,
         GRAB_WIDEOPEN,
         GRAB_CLOSE,
+        GRAB_TOGGLE,
         ARM_FLOOR,
         ARM_POLE,
         ARM_START,
         ARM_UP,
         LIFT_LOWER_TO_DEPOSIT,
         LIFT_RAISE_AFTER_CAPTURE,
+        LIFT_DOWNSTACK,
         AUTOMATE_CAPTURE,
         AUTOMATE_PREP_CAPTURE,
         AUTOMATE_PREP_DEPOSIT_HI,
@@ -489,6 +539,54 @@ public class LiftbotLifter {
         AUTOMATE_PREP_DEPOSIT_LO,
         AUTOMATE_HOME,
         CANCEL
+    }
+
+    public void setUserDriveSettings(double driveSpeed) {
+        if (driveSpeed == 0 && !isUnderManualControl) return;
+
+        if (driveSpeed != 0) {
+            int currentPos = motorLiftLeft.getCurrentPosition();
+            //enforce upper limits
+            if (driveSpeed > 0 && currentPos > maxLiftPosition) driveSpeed = 0;
+            //enforce lower limits
+            if (driveSpeed < 0 && currentPos < minLiftPosition) driveSpeed = 0;
+            if (driveSpeed < 0 && isLimitSwitchPressed()) driveSpeed = 0;
+        }
+
+        if (driveSpeed == 0) {  // when it drops out of manual control, hold
+            isUnderManualControl = false;
+            //stopMotorsAndHold();
+            stopMotors();
+            deferredHold = true;
+            return;
+        }
+
+        if (!isUnderManualControl) {
+            isUnderManualControl = true;
+            stopStateMachine();
+            stopMotors();
+            motorLiftLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            motorLiftRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            return;  // we'll set the speed next time... jerky if you do it immediately after changing mode
+        }
+
+        setDrivePowers(driveSpeed);
+    }
+
+    public void spamTelemetry() {
+        telemetry.addData("~~~~~~~~~~", "~~~~~~~~~~");
+        telemetry.addData("manual control", isUnderManualControl);
+        telemetry.addData("statemachine", stateMachineType);
+        telemetry.addData("statestep", stateMachineStep);
+        telemetry.addData("homed", liftHomed);
+        telemetry.addData("liftposition", motorLiftLeft.getCurrentPosition());
+        telemetry.addData("targetposition", liftTargetPosition);
+        telemetry.addData("in tolerance", isLiftInTolerance());
+        telemetry.addData("servoleft", servoLeft.getPosition());
+        telemetry.addData("servoright", servoRight.getPosition());
+        telemetry.addData("servograb", servoGrab.getPosition());
+        telemetry.addData("cone stack", stackedCone);
+        telemetry.addData("~~~~~~~~~~", "~~~~~~~~~~");
     }
 
     /* private void controlMast() {

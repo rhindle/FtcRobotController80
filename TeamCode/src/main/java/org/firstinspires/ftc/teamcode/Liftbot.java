@@ -52,27 +52,40 @@ public class Liftbot extends LinearOpMode {
         navigator = robot.navigator;
         //controls = robot.controls;
         lifter = new LiftbotLifter(robot);
-        controls = new LiftbotControls(robot);   // this is likely to change, not necessarily standardized with robot
+        controls = new LiftbotControls(robot, lifter);   // this is likely to change, not necessarily standardized with robot
 
         robot.useODO = false;
+        //robot.reverseDrive = true;  // for AndyMark test
+        robot.useDistanceSensors = false;
 
         elapsedTime = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
 
         robot.init();
         robot.sensors.init();
-        drivetrain.init();
-        navigator.init();
+//        drivetrain.init();
+//        navigator.init();
+        lifter.init();
 
         while (!isStarted()) {
+            robot.buttonMgr.loop();
+            if (robot.buttonMgr.wasTapped(1, ButtonMgr.Buttons.X))
+                robot.reverseDrive = !robot.reverseDrive;
+            if (robot.buttonMgr.wasTapped(2, ButtonMgr.Buttons.X))
+                robot.reverseDrive = !robot.reverseDrive;
+
             // Prompt user to press start button.
             telemetry.addData(">", "Press Play to start");
             telemetry.addData(">", "Robot Heading = %.1f", robot.returnImuHeading(true));
+            telemetry.addData("Drive Type:", robot.reverseDrive ? "AndyMark" : "GobildaBot");
             telemetry.update();
-            sleep(100);
+            sleep(20);
         }
 
+        drivetrain.init();
+        navigator.init();
         localizer.init();
         navigator.setMaxSpeed(maxSpeed);
+        //navigator.setDeltaHeading();
 
         if (opModeIsActive()) {
             // Put run blocks here.
@@ -115,21 +128,21 @@ public class Liftbot extends LinearOpMode {
         telemetry.addData("rotate", controls.Rotate);
         telemetry.addData("storedHeading", JavaUtil.formatNumber(navigator.storedHeading, 2));
         telemetry.addData("deltaHeading", JavaUtil.formatNumber(navigator.deltaHeading, 2));
-        telemetry.addData("error", JavaUtil.formatNumber(currentError, 2));
-        telemetry.addData("v0", JavaUtil.formatNumber(navigator.v0, 2));
-        telemetry.addData("v1", JavaUtil.formatNumber(navigator.v2, 2));
-        telemetry.addData("v2", JavaUtil.formatNumber(navigator.v1, 2));
-        telemetry.addData("v3", JavaUtil.formatNumber(navigator.v3, 2));
-        telemetry.addData("rot about Z", JavaUtil.formatNumber(robot.returnImuHeading(),2));
-        telemetry.addData("odo Heading", JavaUtil.formatNumber(localizer.returnOdoHeading(), 2));
-        telemetry.addData("Target X", navigator.targetX);
-        telemetry.addData("Target Y", navigator.targetY);
-        telemetry.addData("Target Rot", navigator.targetRot);
-        telemetry.addData ("OdoY", localizer.encoderY);
-        telemetry.addData ("OdoXL", localizer.encoderXL);
-        telemetry.addData ("OdoXR", localizer.encoderXR);
-        telemetry.addData ("X", JavaUtil.formatNumber(localizer.xPos, 2));
-        telemetry.addData ("Y", JavaUtil.formatNumber(localizer.yPos, 2));
+//        telemetry.addData("error", JavaUtil.formatNumber(currentError, 2));
+//        telemetry.addData("v0", JavaUtil.formatNumber(navigator.v0, 2));
+//        telemetry.addData("v1", JavaUtil.formatNumber(navigator.v2, 2));
+//        telemetry.addData("v2", JavaUtil.formatNumber(navigator.v1, 2));
+//        telemetry.addData("v3", JavaUtil.formatNumber(navigator.v3, 2));
+//        telemetry.addData("rot about Z", JavaUtil.formatNumber(robot.returnImuHeading(),2));
+//        telemetry.addData("odo Heading", JavaUtil.formatNumber(localizer.returnOdoHeading(), 2));
+//        telemetry.addData("Target X", navigator.targetX);
+//        telemetry.addData("Target Y", navigator.targetY);
+//        telemetry.addData("Target Rot", navigator.targetRot);
+//        telemetry.addData ("OdoY", localizer.encoderY);
+//        telemetry.addData ("OdoXL", localizer.encoderXL);
+//        telemetry.addData ("OdoXR", localizer.encoderXR);
+//        telemetry.addData ("X", JavaUtil.formatNumber(localizer.xPos, 2));
+//        telemetry.addData ("Y", JavaUtil.formatNumber(localizer.yPos, 2));
 
 //        telemetry.addData("rangeL", String.format("%.01f in", robot.sensors.distL));
 //        telemetry.addData("rangeM", String.format("%.01f in", robot.sensors.distM));

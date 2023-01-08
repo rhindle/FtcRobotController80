@@ -63,9 +63,15 @@ public class Navigator2 {
       //storedHeading = localizer.returnGlobalHeading();
       //storedHeading = robotPosition.R;
       //setTargetToCurrentPosition();
-      targetX = localizer.odoFieldStart.X;
-      targetY = localizer.odoFieldStart.Y;
-      targetRot = localizer.odoFieldStart.R;
+      if (!robot.useODO) {
+         targetX = 0;
+         targetY = 0;
+         targetRot = 0;
+      } else {
+         targetX = localizer.odoFieldStart.X;
+         targetY = localizer.odoFieldStart.Y;
+         targetRot = localizer.odoFieldStart.R;
+      }
       storedHeading = targetRot;
       deltaHeading = targetRot;
    }

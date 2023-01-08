@@ -31,6 +31,8 @@ public class Robot {
 //    private Telemetry telemetry;
 
     public boolean useODO = true;
+    public boolean reverseDrive = false;
+    public boolean useDistanceSensors = true;
 
     public ButtonMgr buttonMgr;
     public Localizer localizer;

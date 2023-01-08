@@ -65,7 +65,7 @@ public class Odo_2022_v8_Auto2 extends LinearOpMode {
             telemetry.addData("Alliance:", isBlueAlliance ? "BLUE" : "RED");
             telemetry.addData("Left/Right:", isRightSide ? "RIGHT" : "LEFT");
             telemetry.update();
-            sleep(100);
+            sleep(20);
         }
 
         if (home) {

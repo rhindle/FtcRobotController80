@@ -44,10 +44,17 @@ public class Drivetrain {
     }
 
     public void initMotors () {
-        motorLF.setDirection(DcMotorEx.Direction.REVERSE);
-        motorLR.setDirection(DcMotorEx.Direction.REVERSE);
-        motorRF.setDirection(DcMotorEx.Direction.FORWARD);
-        motorRR.setDirection(DcMotorEx.Direction.FORWARD);
+        if (!robot.reverseDrive) {
+            motorLF.setDirection(DcMotorEx.Direction.REVERSE);
+            motorLR.setDirection(DcMotorEx.Direction.REVERSE);
+            motorRF.setDirection(DcMotorEx.Direction.FORWARD);
+            motorRR.setDirection(DcMotorEx.Direction.FORWARD);
+        } else {
+            motorLF.setDirection(DcMotorEx.Direction.FORWARD);
+            motorLR.setDirection(DcMotorEx.Direction.FORWARD);
+            motorRF.setDirection(DcMotorEx.Direction.REVERSE);
+            motorRR.setDirection(DcMotorEx.Direction.REVERSE);
+        }
 
         motorLF.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         motorLR.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
@@ -59,9 +66,13 @@ public class Drivetrain {
         motorRF.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
         motorRR.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
 
-        motorLF.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
-        motorLR.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
-        motorRF.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
-        motorRR.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
+//        motorLF.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
+//        motorLR.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
+//        motorRF.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
+//        motorRR.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
+        motorLF.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        motorLR.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        motorRF.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        motorRR.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
     }
 }

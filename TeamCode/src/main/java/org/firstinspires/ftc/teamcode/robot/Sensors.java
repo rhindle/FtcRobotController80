@@ -37,9 +37,11 @@ public class Sensors {
    }
 
    public void init(){
-      sensor2MLeft = hardwareMap.get(DistanceSensor.class, "2MdistL");
-      sensor2MMiddle = hardwareMap.get(DistanceSensor.class, "2MdistM");
-      sensor2MRight = hardwareMap.get(DistanceSensor.class, "2MdistR");
+      if (robot.useDistanceSensors) {
+         sensor2MLeft = hardwareMap.get(DistanceSensor.class, "2MdistL");
+         sensor2MMiddle = hardwareMap.get(DistanceSensor.class, "2MdistM");
+         sensor2MRight = hardwareMap.get(DistanceSensor.class, "2MdistR");
+      }
       ledRED = hardwareMap.get(DigitalChannel.class, "digital6B");
       ledGREEN = hardwareMap.get(DigitalChannel.class, "digital7B");
       ledRED.setMode(DigitalChannel.Mode.OUTPUT);
@@ -52,7 +54,7 @@ public class Sensors {
    }
 
    public void loop(){
-      updateDistanceSensors();
+      if (robot.useDistanceSensors) updateDistanceSensors();
    }
 
    private void updateDistanceSensors() {
