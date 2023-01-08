@@ -1,10 +1,15 @@
-package org.firstinspires.ftc.teamcode;
+package Ignore;
+
+import android.os.Environment;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.JavaUtil;
@@ -12,14 +17,23 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
-import org.firstinspires.ftc.teamcode.robot.ButtonMgr;
-import org.firstinspires.ftc.teamcode.robot.Robot;
 
-@TeleOp(name = "3Odo_2022_v6", group = "")
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
+import java.lang.reflect.Field;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+
+@TeleOp(name = "3Odo_Test_4_log", group = "")
 @Disabled
-public class Odo_2022_v6 extends LinearOpMode {
+public class Odo_Test_4_log extends LinearOpMode {
 
     private BNO055IMU imu;
+    private Writer fileWriter;
 
     private DcMotorEx motor0, motor2, motor1, motor3, odoXL, odoY, odoXR;
     private long encoder0, encoder2, encoder1, encoder3, encoderY, encoderXL, encoderXR;
@@ -45,8 +59,6 @@ public class Odo_2022_v6 extends LinearOpMode {
     private double deltaHeading = 0;
     private int toggleRotate;
 
-    //private boolean last_left, last_right, last_up, last_down, last_x, last_y;
-
     private final double maxSpeed = 1;//0.2;
 
     double DriveSpeed, DriveAngle, Rotate;
@@ -58,19 +70,13 @@ public class Odo_2022_v6 extends LinearOpMode {
     boolean accurate = true;
     int navStep = 0;
     private ElapsedTime navTime = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
+    private ElapsedTime logTime = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
     int lastStep = 0;
-
-    public ButtonMgr buttonMgr;
-    public Robot robot;
-
-    //DELETE THIS CRAP
-    private int countTap = 0;
-    private int countRelease = 0;
 
     // type, x, y, rot
     // where type 1 = accurate, 2 = transition, 3 = pause..., 4 = (not used yet), 999 = end routine
     double[][] autoScript = {
-            {1, 0, 0, 0},
+/*            {1, 0, 0, 0},
 //            {2, 10, -10, 90},
 //            {2, 20, 0, -90},
 //            {1, 36, 0, -120},
@@ -84,6 +90,23 @@ public class Odo_2022_v6 extends LinearOpMode {
             {1, 24, 0, 0},
             {3, 1000},
             {1, 0, 0, 0},
+            {999}*/
+            {2, 0, 0, 0},
+            {2, 51, 0, 0},
+            {1, 60, -40, 0},
+            {3, 1000},
+            {1, 60, -48, 0},
+            {3, 1000},
+            {1, 60, -56, 0},
+            {3, 1000},
+            {1, 94, -23, 90},
+            {3, 2000},
+            {2, 62, -46, 180},
+            {1, 19, -48, 180},
+            {3, 2000},
+            {1, 84, -27, 90},
+            {3, 2000},
+            {1, 74, -26, 90},
             {999}
     };
 
@@ -94,62 +117,37 @@ public class Odo_2022_v6 extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        //imu = hardwareMap.get(BNO055IMU.class, "imu");
+        imu = hardwareMap.get(BNO055IMU.class, "imu");
 
-        robot = new Robot(this);
-        buttonMgr = new ButtonMgr(this);
-        elapsedTime = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
+        // Important Step 1:  Make sure you use DcMotorEx when you instantiate your motors.
+        motor0 = hardwareMap.get(DcMotorEx.class, "motor0");  // Configure the robot to use these 4 motor names,
+        motor2 = hardwareMap.get(DcMotorEx.class, "motor2");  // or change these strings to match your existing Robot Configuration.
+        motor1 = hardwareMap.get(DcMotorEx.class, "motor1");
+        motor3 = hardwareMap.get(DcMotorEx.class, "motor3");
+        odoY = hardwareMap.get(DcMotorEx.class, "motor0B");
+        odoXR = hardwareMap.get(DcMotorEx.class, "motor1B");
+        odoXL = hardwareMap.get(DcMotorEx.class, "motor2B");
 
-        robot.init();
+        // Important Step 2: Get access to a list of Expansion Hub Modules to enable changing caching methods.
+        List<LynxModule> allHubs = hardwareMap.getAll(LynxModule.class);
 
-        motor0 = robot.motor0;
-        motor1 = robot.motor1;
-        motor2 = robot.motor2;
-        motor3 = robot.motor3;
-        odoY = robot.motor0B;
-        odoXR = robot.motor1B;
-        odoXL = robot.motor2B;
-        imu = robot.sensorIMU;
+        initialize();
 
-//        // Important Step 1:  Make sure you use DcMotorEx when you instantiate your motors.
-//        motor0 = hardwareMap.get(DcMotorEx.class, "motor0");  // Configure the robot to use these 4 motor names,
-//        motor2 = hardwareMap.get(DcMotorEx.class, "motor2");  // or change these strings to match your existing Robot Configuration.
-//        motor1 = hardwareMap.get(DcMotorEx.class, "motor1");
-//        motor3 = hardwareMap.get(DcMotorEx.class, "motor3");
-//        odoY = hardwareMap.get(DcMotorEx.class, "motor0B");
-//        odoXR = hardwareMap.get(DcMotorEx.class, "motor1B");
-//        odoXL = hardwareMap.get(DcMotorEx.class, "motor2B");
-
-//        // Important Step 2: Get access to a list of Expansion Hub Modules to enable changing caching methods.
-//        List<LynxModule> allHubs = hardwareMap.getAll(LynxModule.class);
-//
-//        initialize();
-//
-//        // Important Step 3: Option B. Set all Expansion hubs to use the MANUAL Bulk Caching mode
-//        // Bug info https://github.com/FIRST-Tech-Challenge/SkyStone/issues/232
-//        for (LynxModule module : allHubs) {
-//            module.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
-//        }
-//        /*for(LynxModule module : allHubs){
-//            module.clearBulkCache();
-//            try {
-//                Class<LynxModule> LynxModuleClass = LynxModule.class;
-//                Field lynxModuleField = LynxModuleClass.getDeclaredField("lastBulkData");
-//                lynxModuleField.setAccessible(true);
-//                lynxModuleField.set(module,module.getBulkData());
-//            }catch(NoSuchFieldException|IllegalAccessException e){
-//                e.printStackTrace();
-//            }
-//        }*/
-
-        initMotors();
-
-        while (!isStarted()) {
-            // Prompt user to press start button.
-            telemetry.addData(">", "Press Play to start");
-            telemetry.addData(">", "Robot Heading = %.1f", robot.returnImuHeading(true));
-            telemetry.update();
-            sleep(100);
+        // Important Step 3: Option B. Set all Expansion hubs to use the MANUAL Bulk Caching mode
+        // Bug info https://github.com/FIRST-Tech-Challenge/SkyStone/issues/232
+        /*for (LynxModule module : allHubs) {
+            module.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
+        }*/
+        for(LynxModule module : allHubs){
+            module.clearBulkCache();
+            try {
+                Class<LynxModule> LynxModuleClass = LynxModule.class;
+                Field lynxModuleField = LynxModuleClass.getDeclaredField("lastBulkData");
+                lynxModuleField.setAccessible(true);
+                lynxModuleField.set(module,module.getBulkData());
+            }catch(NoSuchFieldException|IllegalAccessException e){
+                e.printStackTrace();
+            }
         }
 
         encoderY0 = odoY.getCurrentPosition();
@@ -162,13 +160,10 @@ public class Odo_2022_v6 extends LinearOpMode {
             // Put run blocks here.
             while (opModeIsActive()) {
 
-                robot.loop();
-                buttonMgr.updateAll();
-
-//                // Important Step 4: If you are using MANUAL mode, you must clear the BulkCache once per control cycle
-//                for (LynxModule module : allHubs) {
-//                    module.clearBulkCache();
-//                }
+                // Important Step 4: If you are using MANUAL mode, you must clear the BulkCache once per control cycle
+                for (LynxModule module : allHubs) {
+                    module.clearBulkCache();
+                }
 
                 //encoder0 = motor0.getCurrentPosition();
                 //encoder1 = motor1.getCurrentPosition();
@@ -179,11 +174,12 @@ public class Odo_2022_v6 extends LinearOpMode {
                 encoderXR = odoXR.getCurrentPosition();
 
                 // Display orientation info.
-//                globalHeading = getHeading();
-                globalHeading = robot.returnImuHeading();
+                globalHeading = getHeading();
                 odoHeading = getOdoHeading();
 
                 updateXY();
+
+                updateLog();
 
                 addTelemetryLoopStart();
                 Controls();
@@ -209,6 +205,37 @@ public class Odo_2022_v6 extends LinearOpMode {
 
                 telemetry.update();
             }
+        }
+
+        try {
+            fileWriter.close();
+        } catch (IOException e) {
+            throw new RuntimeException("Cannot close file", e);
+        }
+
+    }
+
+    private void writeToFile(String data) {
+        try {
+            fileWriter.write(data);
+        } catch (IOException e) {
+            throw new RuntimeException("Cannot write to file", e);
+        }
+    }
+
+    private void updateLog() {
+        if (logTime.milliseconds()>100) {
+            logTime.reset();
+            writeToFile(String.valueOf(elapsedTime.milliseconds()));
+            writeToFile(", ");
+            writeToFile(String.valueOf(xPos));
+            writeToFile(", ");
+            writeToFile(String.valueOf(yPos));
+            writeToFile(", ");
+            writeToFile(String.valueOf(globalHeading));
+            writeToFile(", ");
+            writeToFile(String.valueOf(odoHeading));
+            writeToFile("\n");
         }
     }
 
@@ -303,19 +330,30 @@ public class Odo_2022_v6 extends LinearOpMode {
         return angles.firstAngle;
     }
 
-//    // Initialization routine
-//    private void initialize() {
-//        elapsedTime = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
-//        // Set motor directions and modes
-//        initMotors();
-//        initIMU();
-//        while (!isStarted()) {
-//            // Prompt user to press start buton.
-//            telemetry.addData(">", "Press Play to start");
-//            telemetry.addData("Heading (Rot about Z)", globalHeading);
-//            telemetry.update();
-//        }
-//    }
+    // Initialization routine
+    private void initialize() {
+        elapsedTime = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
+
+        DateFormat df = new SimpleDateFormat("yyyyMMdd-HHmmss");
+        String dateString = df.format(new Date());
+
+        String logFilePath = String.format("%s/FIRST/odo4_%s.txt", Environment.getExternalStorageDirectory().getAbsolutePath(), dateString );
+        try {
+            FileWriter writer = new FileWriter(logFilePath);
+            fileWriter = new BufferedWriter(writer);
+        } catch (IOException e) {
+            throw new RuntimeException("Cannot write to file", e);
+        }
+        // Set motor directions and modes
+        initMotors();
+        initIMU();
+        while (!isStarted()) {
+            // Prompt user to press start buton.
+            telemetry.addData(">", "Press Play to start");
+            telemetry.addData("Heading (Rot about Z)", globalHeading);
+            telemetry.update();
+        }
+    }
 
     // average of two headings
     public double getAvgHeading (double firstHeading, double secondHeading) {
@@ -440,105 +478,18 @@ public class Odo_2022_v6 extends LinearOpMode {
     // Interpret user control inputs
     private void Controls() {
 
-        //buttonMgr.updateAll();
-
-        //if (lkController.isPressed(1, LKControllerBad.GPbuttons.BACK)) {
-        //    telemetry.addData("BACK IS PRESSED", 0);
-        //};
-        telemetry.addData("BACK PRESSED", buttonMgr.isPressed(1, ButtonMgr.Buttons.BACK));
-        if (buttonMgr.wasTapped(1, ButtonMgr.Buttons.BACK)) {
-            countTap++;
-        };
-        //if (lkController.isHeld(1, LKControllerBad.GPbuttons.BACK)) {
-        //    telemetry.addData("BACK HELD", 0);
-        //};
-        telemetry.addData("BACK HELD", buttonMgr.isHeld(1, ButtonMgr.Buttons.BACK));
-        if (buttonMgr.wasReleased(1, ButtonMgr.Buttons.BACK)) {
-            countRelease++;
-        };
-        telemetry.addData("BACK TAP COUNT", countTap);
-        telemetry.addData("BACK REL COUNT", countRelease);
-
-        // This blob is for manually entering destinations
+        // This blob is for manually entering desitnations
         if (gamepad2.a) {
             targetX = Math.round(xPos);
             targetY = Math.round(yPos);
             targetRot = Math.round(globalHeading);
         }
-        //if (gamepad2.dpad_up) targetX++;
-        //if (gamepad2.dpad_down) targetX--;
-        //if (gamepad2.dpad_left) targetY++;
-        //if (gamepad2.dpad_right) targetY--;
-        //if (gamepad2.x) targetRot++;
-        //if (gamepad2.y) targetRot--;
-
-        /*if (!gamepad2.dpad_up) {
-            last_up = false;
-        }
-        else if (!last_up) {
-            targetX = targetX + (gamepad2.back ? 1 : 11.75);
-            last_up = true;
-        }
-
-        if (!gamepad2.dpad_down) {
-            last_down = false;
-        }
-        else if (!last_down) {
-            targetX = targetX - (gamepad2.back ? 1 : 11.75);
-            last_down = true;
-        }
-
-        if (!gamepad2.dpad_left) {
-            last_left = false;
-        }
-        else if (!last_left) {
-            targetY = targetY + (gamepad2.back ? 1 : 11.75);
-            last_left = true;
-        }
-
-        if (!gamepad2.dpad_right) {
-            last_right = false;
-        }
-        else if (!last_right) {
-            targetY = targetY - (gamepad2.back ? 1 : 11.75);
-            last_right = true;
-        }
-
-        if (!gamepad2.x) {
-            last_x = false;
-        }
-        else if (!last_x) {
-            targetRot = targetRot + (gamepad2.back ? 2 : 45);
-            last_x = true;
-        }
-
-        if (!gamepad2.y) {
-            last_y = false;
-        }
-        else if (!last_y) {
-            targetRot = targetRot - (gamepad2.back ? 2 : 45);
-            last_y = true;
-        } */
-
-        if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.dpadUP)) {
-            targetX = targetX + (gamepad2.back ? 1 : 11.75);
-        }
-        if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.dpadDOWN)) {
-            targetX = targetX - (gamepad2.back ? 1 : 11.75);
-        }
-        if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.dpadLEFT)) {
-            targetY = targetY + (gamepad2.back ? 1 : 11.75);
-        }
-        if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.dpadRIGHT)) {
-            targetY = targetY - (gamepad2.back ? 1 : 11.75);
-        }
-        if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.X)) {
-            targetRot = targetRot + (gamepad2.back ? 2 : 45);
-        }
-        if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.Y)) {
-            targetRot = targetRot - (gamepad2.back ? 2 : 45);
-        }
-
+        if (gamepad2.dpad_up) targetX++;
+        if (gamepad2.dpad_down) targetX--;
+        if (gamepad2.dpad_left) targetY++;
+        if (gamepad2.dpad_right) targetY--;
+        if (gamepad2.x) targetRot++;
+        if (gamepad2.y) targetRot--;
         if (gamepad2.start) navigate=1;
 
         // Cancels auto navigation
@@ -560,8 +511,6 @@ public class Odo_2022_v6 extends LinearOpMode {
             navStep=0;
             navTime.reset();
         }
-
-        // ???? if (gamepad1
 
         // Get speed and direction from left stick
         DriveSpeed = JavaUtil.minOfList(JavaUtil.createListWith(1, math_hypot(gamepad1.left_stick_x, gamepad1.left_stick_y)));
@@ -602,43 +551,43 @@ public class Odo_2022_v6 extends LinearOpMode {
 
     // Motor init
     private void initMotors() {
-        motor0.setDirection(DcMotorEx.Direction.REVERSE);
-        motor2.setDirection(DcMotorEx.Direction.REVERSE);
-        motor1.setDirection(DcMotorEx.Direction.FORWARD);
-        motor3.setDirection(DcMotorEx.Direction.FORWARD);
-        odoY.setDirection(DcMotorEx.Direction.FORWARD);
-        odoXL.setDirection(DcMotorEx.Direction.REVERSE);
-        odoXR.setDirection(DcMotorEx.Direction.REVERSE);
-        motor0.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-        motor2.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-        motor1.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-        motor3.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-        odoY.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-        odoXL.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-        odoXR.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-        motor0.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-        motor2.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-        motor1.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-        motor3.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-        motor0.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
-        motor2.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
-        motor1.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
-        motor3.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
+        motor0.setDirection(DcMotorSimple.Direction.REVERSE);
+        motor2.setDirection(DcMotorSimple.Direction.REVERSE);
+        motor1.setDirection(DcMotorSimple.Direction.FORWARD);
+        motor3.setDirection(DcMotorSimple.Direction.FORWARD);
+        odoY.setDirection(DcMotorSimple.Direction.FORWARD);
+        odoXL.setDirection(DcMotorSimple.Direction.REVERSE);
+        odoXR.setDirection(DcMotorSimple.Direction.REVERSE);
+        motor0.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        motor2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        motor1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        motor3.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        odoY.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        odoXL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        odoXR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        motor0.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        motor2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        motor1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        motor3.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        motor0.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        motor2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        motor1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        motor3.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
     }
 
     // IMU init
-//    private void initIMU() {
-//        BNO055IMU.Parameters imuParameters;
-//
-//        // Create new IMU Parameters object.
-//        imuParameters = new BNO055IMU.Parameters();
-//        // Use degrees as angle unit.
-//        imuParameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
-//        // Disable logging.
-//        imuParameters.loggingEnabled = false;
-//        // Initialize IMU.
-//        imu.initialize(imuParameters);
-//    }
+    private void initIMU() {
+        BNO055IMU.Parameters imuParameters;
+
+        // Create new IMU Parameters object.
+        imuParameters = new BNO055IMU.Parameters();
+        // Use degrees as angle unit.
+        imuParameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
+        // Disable logging.
+        imuParameters.loggingEnabled = false;
+        // Initialize IMU.
+        imu.initialize(imuParameters);
+    }
 
     private void addTelemetryLoopStart() {
         telemetry.addData("Loop time (ms)", JavaUtil.formatNumber(calculateLoopTime(), 0));

@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package Ignore;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.Gamepad;

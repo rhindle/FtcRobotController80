@@ -1,13 +1,10 @@
-package org.firstinspires.ftc.teamcode;
+package Ignore;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
-import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.JavaUtil;
@@ -15,12 +12,12 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+import org.firstinspires.ftc.teamcode.robot.ButtonMgr;
+import org.firstinspires.ftc.teamcode.robot.Robot;
 
-import java.util.List;
-
-@TeleOp(name = "3Odo_2022_v5Bad", group = "")
+@TeleOp(name = "3Odo_2022_v6", group = "")
 @Disabled
-public class Odo_2022_v5Bad extends LinearOpMode {
+public class Odo_2022_v6 extends LinearOpMode {
 
     private BNO055IMU imu;
 
@@ -63,7 +60,9 @@ public class Odo_2022_v5Bad extends LinearOpMode {
     private ElapsedTime navTime = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
     int lastStep = 0;
 
-    public LKControllerBad lkController;
+    public ButtonMgr buttonMgr;
+    public Robot robot;
+
     //DELETE THIS CRAP
     private int countTap = 0;
     private int countRelease = 0;
@@ -95,40 +94,63 @@ public class Odo_2022_v5Bad extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        imu = hardwareMap.get(BNO055IMU.class, "imu");
+        //imu = hardwareMap.get(BNO055IMU.class, "imu");
 
-        lkController = new LKControllerBad(this);
+        robot = new Robot(this);
+        buttonMgr = new ButtonMgr(this);
+        elapsedTime = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
 
-        // Important Step 1:  Make sure you use DcMotorEx when you instantiate your motors.
-        motor0 = hardwareMap.get(DcMotorEx.class, "motor0");  // Configure the robot to use these 4 motor names,
-        motor2 = hardwareMap.get(DcMotorEx.class, "motor2");  // or change these strings to match your existing Robot Configuration.
-        motor1 = hardwareMap.get(DcMotorEx.class, "motor1");
-        motor3 = hardwareMap.get(DcMotorEx.class, "motor3");
-        odoY = hardwareMap.get(DcMotorEx.class, "motor0B");
-        odoXR = hardwareMap.get(DcMotorEx.class, "motor1B");
-        odoXL = hardwareMap.get(DcMotorEx.class, "motor2B");
+        robot.init();
 
-        // Important Step 2: Get access to a list of Expansion Hub Modules to enable changing caching methods.
-        List<LynxModule> allHubs = hardwareMap.getAll(LynxModule.class);
+        motor0 = robot.motor0;
+        motor1 = robot.motor1;
+        motor2 = robot.motor2;
+        motor3 = robot.motor3;
+        odoY = robot.motor0B;
+        odoXR = robot.motor1B;
+        odoXL = robot.motor2B;
+        imu = robot.sensorIMU;
 
-        initialize();
+//        // Important Step 1:  Make sure you use DcMotorEx when you instantiate your motors.
+//        motor0 = hardwareMap.get(DcMotorEx.class, "motor0");  // Configure the robot to use these 4 motor names,
+//        motor2 = hardwareMap.get(DcMotorEx.class, "motor2");  // or change these strings to match your existing Robot Configuration.
+//        motor1 = hardwareMap.get(DcMotorEx.class, "motor1");
+//        motor3 = hardwareMap.get(DcMotorEx.class, "motor3");
+//        odoY = hardwareMap.get(DcMotorEx.class, "motor0B");
+//        odoXR = hardwareMap.get(DcMotorEx.class, "motor1B");
+//        odoXL = hardwareMap.get(DcMotorEx.class, "motor2B");
 
-        // Important Step 3: Option B. Set all Expansion hubs to use the MANUAL Bulk Caching mode
-        // Bug info https://github.com/FIRST-Tech-Challenge/SkyStone/issues/232
-        for (LynxModule module : allHubs) {
-            module.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
+//        // Important Step 2: Get access to a list of Expansion Hub Modules to enable changing caching methods.
+//        List<LynxModule> allHubs = hardwareMap.getAll(LynxModule.class);
+//
+//        initialize();
+//
+//        // Important Step 3: Option B. Set all Expansion hubs to use the MANUAL Bulk Caching mode
+//        // Bug info https://github.com/FIRST-Tech-Challenge/SkyStone/issues/232
+//        for (LynxModule module : allHubs) {
+//            module.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
+//        }
+//        /*for(LynxModule module : allHubs){
+//            module.clearBulkCache();
+//            try {
+//                Class<LynxModule> LynxModuleClass = LynxModule.class;
+//                Field lynxModuleField = LynxModuleClass.getDeclaredField("lastBulkData");
+//                lynxModuleField.setAccessible(true);
+//                lynxModuleField.set(module,module.getBulkData());
+//            }catch(NoSuchFieldException|IllegalAccessException e){
+//                e.printStackTrace();
+//            }
+//        }*/
+
+        initMotors();
+
+        while (!isStarted()) {
+            // Prompt user to press start button.
+            telemetry.addData(">", "Press Play to start");
+            telemetry.addData(">", "Robot Heading = %.1f", robot.returnImuHeading(true));
+            telemetry.update();
+            sleep(100);
         }
-        /*for(LynxModule module : allHubs){
-            module.clearBulkCache();
-            try {
-                Class<LynxModule> LynxModuleClass = LynxModule.class;
-                Field lynxModuleField = LynxModuleClass.getDeclaredField("lastBulkData");
-                lynxModuleField.setAccessible(true);
-                lynxModuleField.set(module,module.getBulkData());
-            }catch(NoSuchFieldException|IllegalAccessException e){
-                e.printStackTrace();
-            }
-        }*/
 
         encoderY0 = odoY.getCurrentPosition();
         encoderXL0 = odoXL.getCurrentPosition();
@@ -140,10 +162,13 @@ public class Odo_2022_v5Bad extends LinearOpMode {
             // Put run blocks here.
             while (opModeIsActive()) {
 
-                // Important Step 4: If you are using MANUAL mode, you must clear the BulkCache once per control cycle
-                for (LynxModule module : allHubs) {
-                    module.clearBulkCache();
-                }
+                robot.loop();
+                buttonMgr.updateAll();
+
+//                // Important Step 4: If you are using MANUAL mode, you must clear the BulkCache once per control cycle
+//                for (LynxModule module : allHubs) {
+//                    module.clearBulkCache();
+//                }
 
                 //encoder0 = motor0.getCurrentPosition();
                 //encoder1 = motor1.getCurrentPosition();
@@ -154,7 +179,8 @@ public class Odo_2022_v5Bad extends LinearOpMode {
                 encoderXR = odoXR.getCurrentPosition();
 
                 // Display orientation info.
-                globalHeading = getHeading();
+//                globalHeading = getHeading();
+                globalHeading = robot.returnImuHeading();
                 odoHeading = getOdoHeading();
 
                 updateXY();
@@ -277,19 +303,19 @@ public class Odo_2022_v5Bad extends LinearOpMode {
         return angles.firstAngle;
     }
 
-    // Initialization routine
-    private void initialize() {
-        elapsedTime = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
-        // Set motor directions and modes
-        initMotors();
-        initIMU();
-        while (!isStarted()) {
-            // Prompt user to press start buton.
-            telemetry.addData(">", "Press Play to start");
-            telemetry.addData("Heading (Rot about Z)", globalHeading);
-            telemetry.update();
-        }
-    }
+//    // Initialization routine
+//    private void initialize() {
+//        elapsedTime = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
+//        // Set motor directions and modes
+//        initMotors();
+//        initIMU();
+//        while (!isStarted()) {
+//            // Prompt user to press start buton.
+//            telemetry.addData(">", "Press Play to start");
+//            telemetry.addData("Heading (Rot about Z)", globalHeading);
+//            telemetry.update();
+//        }
+//    }
 
     // average of two headings
     public double getAvgHeading (double firstHeading, double secondHeading) {
@@ -414,20 +440,20 @@ public class Odo_2022_v5Bad extends LinearOpMode {
     // Interpret user control inputs
     private void Controls() {
 
-        lkController.updateAll();
+        //buttonMgr.updateAll();
 
         //if (lkController.isPressed(1, LKControllerBad.GPbuttons.BACK)) {
         //    telemetry.addData("BACK IS PRESSED", 0);
         //};
-        telemetry.addData("BACK PRESSED",lkController.isPressed(1, LKControllerBad.GPbuttons.BACK));
-        if (lkController.wasTapped(1, LKControllerBad.GPbuttons.BACK)) {
+        telemetry.addData("BACK PRESSED", buttonMgr.isPressed(1, ButtonMgr.Buttons.BACK));
+        if (buttonMgr.wasTapped(1, ButtonMgr.Buttons.BACK)) {
             countTap++;
         };
         //if (lkController.isHeld(1, LKControllerBad.GPbuttons.BACK)) {
         //    telemetry.addData("BACK HELD", 0);
         //};
-        telemetry.addData("BACK HELD",lkController.isHeld(1, LKControllerBad.GPbuttons.BACK));
-        if (lkController.wasReleased(1, LKControllerBad.GPbuttons.BACK)) {
+        telemetry.addData("BACK HELD", buttonMgr.isHeld(1, ButtonMgr.Buttons.BACK));
+        if (buttonMgr.wasReleased(1, ButtonMgr.Buttons.BACK)) {
             countRelease++;
         };
         telemetry.addData("BACK TAP COUNT", countTap);
@@ -494,22 +520,22 @@ public class Odo_2022_v5Bad extends LinearOpMode {
             last_y = true;
         } */
 
-        if (lkController.wasTapped(2, LKControllerBad.GPbuttons.dpadUP)) {
+        if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.dpadUP)) {
             targetX = targetX + (gamepad2.back ? 1 : 11.75);
         }
-        if (lkController.wasTapped(2, LKControllerBad.GPbuttons.dpadDOWN)) {
+        if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.dpadDOWN)) {
             targetX = targetX - (gamepad2.back ? 1 : 11.75);
         }
-        if (lkController.wasTapped(2, LKControllerBad.GPbuttons.dpadLEFT)) {
+        if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.dpadLEFT)) {
             targetY = targetY + (gamepad2.back ? 1 : 11.75);
         }
-        if (lkController.wasTapped(2, LKControllerBad.GPbuttons.dpadRIGHT)) {
+        if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.dpadRIGHT)) {
             targetY = targetY - (gamepad2.back ? 1 : 11.75);
         }
-        if (lkController.wasTapped(2, LKControllerBad.GPbuttons.X)) {
+        if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.X)) {
             targetRot = targetRot + (gamepad2.back ? 2 : 45);
         }
-        if (lkController.wasTapped(2, LKControllerBad.GPbuttons.Y)) {
+        if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.Y)) {
             targetRot = targetRot - (gamepad2.back ? 2 : 45);
         }
 
@@ -576,43 +602,43 @@ public class Odo_2022_v5Bad extends LinearOpMode {
 
     // Motor init
     private void initMotors() {
-        motor0.setDirection(DcMotorSimple.Direction.REVERSE);
-        motor2.setDirection(DcMotorSimple.Direction.REVERSE);
-        motor1.setDirection(DcMotorSimple.Direction.FORWARD);
-        motor3.setDirection(DcMotorSimple.Direction.FORWARD);
-        odoY.setDirection(DcMotorSimple.Direction.FORWARD);
-        odoXL.setDirection(DcMotorSimple.Direction.REVERSE);
-        odoXR.setDirection(DcMotorSimple.Direction.REVERSE);
-        motor0.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        motor2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        motor1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        motor3.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        odoY.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        odoXL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        odoXR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        motor0.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        motor2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        motor1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        motor3.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        motor0.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        motor2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        motor1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        motor3.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        motor0.setDirection(DcMotorEx.Direction.REVERSE);
+        motor2.setDirection(DcMotorEx.Direction.REVERSE);
+        motor1.setDirection(DcMotorEx.Direction.FORWARD);
+        motor3.setDirection(DcMotorEx.Direction.FORWARD);
+        odoY.setDirection(DcMotorEx.Direction.FORWARD);
+        odoXL.setDirection(DcMotorEx.Direction.REVERSE);
+        odoXR.setDirection(DcMotorEx.Direction.REVERSE);
+        motor0.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        motor2.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        motor1.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        motor3.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        odoY.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        odoXL.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        odoXR.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        motor0.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        motor2.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        motor1.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        motor3.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        motor0.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
+        motor2.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
+        motor1.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
+        motor3.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
     }
 
     // IMU init
-    private void initIMU() {
-        BNO055IMU.Parameters imuParameters;
-
-        // Create new IMU Parameters object.
-        imuParameters = new BNO055IMU.Parameters();
-        // Use degrees as angle unit.
-        imuParameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
-        // Disable logging.
-        imuParameters.loggingEnabled = false;
-        // Initialize IMU.
-        imu.initialize(imuParameters);
-    }
+//    private void initIMU() {
+//        BNO055IMU.Parameters imuParameters;
+//
+//        // Create new IMU Parameters object.
+//        imuParameters = new BNO055IMU.Parameters();
+//        // Use degrees as angle unit.
+//        imuParameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
+//        // Disable logging.
+//        imuParameters.loggingEnabled = false;
+//        // Initialize IMU.
+//        imu.initialize(imuParameters);
+//    }
 
     private void addTelemetryLoopStart() {
         telemetry.addData("Loop time (ms)", JavaUtil.formatNumber(calculateLoopTime(), 0));

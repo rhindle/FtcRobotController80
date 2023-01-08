@@ -1,6 +1,4 @@
-package org.firstinspires.ftc.teamcode;
-
-import android.os.Environment;
+package Ignore;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.lynx.LynxModule;
@@ -18,22 +16,13 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Writer;
-import java.lang.reflect.Field;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 
-@TeleOp(name = "3Odo_Test_4_log", group = "")
+@TeleOp(name = "3Odo_2022_v5", group = "")
 @Disabled
-public class Odo_Test_4_log extends LinearOpMode {
+public class Odo_2022_v5 extends LinearOpMode {
 
     private BNO055IMU imu;
-    private Writer fileWriter;
 
     private DcMotorEx motor0, motor2, motor1, motor3, odoXL, odoY, odoXR;
     private long encoder0, encoder2, encoder1, encoder3, encoderY, encoderXL, encoderXR;
@@ -59,6 +48,8 @@ public class Odo_Test_4_log extends LinearOpMode {
     private double deltaHeading = 0;
     private int toggleRotate;
 
+    private boolean last_left, last_right, last_up, last_down, last_x, last_y;
+
     private final double maxSpeed = 1;//0.2;
 
     double DriveSpeed, DriveAngle, Rotate;
@@ -70,13 +61,14 @@ public class Odo_Test_4_log extends LinearOpMode {
     boolean accurate = true;
     int navStep = 0;
     private ElapsedTime navTime = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
-    private ElapsedTime logTime = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
     int lastStep = 0;
+
+    public LKController lkController;
 
     // type, x, y, rot
     // where type 1 = accurate, 2 = transition, 3 = pause..., 4 = (not used yet), 999 = end routine
     double[][] autoScript = {
-/*            {1, 0, 0, 0},
+            {1, 0, 0, 0},
 //            {2, 10, -10, 90},
 //            {2, 20, 0, -90},
 //            {1, 36, 0, -120},
@@ -90,23 +82,6 @@ public class Odo_Test_4_log extends LinearOpMode {
             {1, 24, 0, 0},
             {3, 1000},
             {1, 0, 0, 0},
-            {999}*/
-            {2, 0, 0, 0},
-            {2, 51, 0, 0},
-            {1, 60, -40, 0},
-            {3, 1000},
-            {1, 60, -48, 0},
-            {3, 1000},
-            {1, 60, -56, 0},
-            {3, 1000},
-            {1, 94, -23, 90},
-            {3, 2000},
-            {2, 62, -46, 180},
-            {1, 19, -48, 180},
-            {3, 2000},
-            {1, 84, -27, 90},
-            {3, 2000},
-            {1, 74, -26, 90},
             {999}
     };
 
@@ -118,6 +93,8 @@ public class Odo_Test_4_log extends LinearOpMode {
     @Override
     public void runOpMode() {
         imu = hardwareMap.get(BNO055IMU.class, "imu");
+
+        lkController = new LKController(this);
 
         // Important Step 1:  Make sure you use DcMotorEx when you instantiate your motors.
         motor0 = hardwareMap.get(DcMotorEx.class, "motor0");  // Configure the robot to use these 4 motor names,
@@ -135,10 +112,10 @@ public class Odo_Test_4_log extends LinearOpMode {
 
         // Important Step 3: Option B. Set all Expansion hubs to use the MANUAL Bulk Caching mode
         // Bug info https://github.com/FIRST-Tech-Challenge/SkyStone/issues/232
-        /*for (LynxModule module : allHubs) {
+        for (LynxModule module : allHubs) {
             module.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
-        }*/
-        for(LynxModule module : allHubs){
+        }
+        /*for(LynxModule module : allHubs){
             module.clearBulkCache();
             try {
                 Class<LynxModule> LynxModuleClass = LynxModule.class;
@@ -148,7 +125,7 @@ public class Odo_Test_4_log extends LinearOpMode {
             }catch(NoSuchFieldException|IllegalAccessException e){
                 e.printStackTrace();
             }
-        }
+        }*/
 
         encoderY0 = odoY.getCurrentPosition();
         encoderXL0 = odoXL.getCurrentPosition();
@@ -179,8 +156,6 @@ public class Odo_Test_4_log extends LinearOpMode {
 
                 updateXY();
 
-                updateLog();
-
                 addTelemetryLoopStart();
                 Controls();
 
@@ -195,47 +170,16 @@ public class Odo_Test_4_log extends LinearOpMode {
                 }
 
 
-                // set motor power
-                motor0.setPower(v0);
-                motor2.setPower(v1);
-                motor1.setPower(v2);
-                motor3.setPower(v3);
+//                // set motor power
+//                motor0.setPower(v0);
+//                motor2.setPower(v1);
+//                motor1.setPower(v2);
+//                motor3.setPower(v3);
 
                 addTelemetryLoopEnd();
 
                 telemetry.update();
             }
-        }
-
-        try {
-            fileWriter.close();
-        } catch (IOException e) {
-            throw new RuntimeException("Cannot close file", e);
-        }
-
-    }
-
-    private void writeToFile(String data) {
-        try {
-            fileWriter.write(data);
-        } catch (IOException e) {
-            throw new RuntimeException("Cannot write to file", e);
-        }
-    }
-
-    private void updateLog() {
-        if (logTime.milliseconds()>100) {
-            logTime.reset();
-            writeToFile(String.valueOf(elapsedTime.milliseconds()));
-            writeToFile(", ");
-            writeToFile(String.valueOf(xPos));
-            writeToFile(", ");
-            writeToFile(String.valueOf(yPos));
-            writeToFile(", ");
-            writeToFile(String.valueOf(globalHeading));
-            writeToFile(", ");
-            writeToFile(String.valueOf(odoHeading));
-            writeToFile("\n");
         }
     }
 
@@ -333,17 +277,6 @@ public class Odo_Test_4_log extends LinearOpMode {
     // Initialization routine
     private void initialize() {
         elapsedTime = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
-
-        DateFormat df = new SimpleDateFormat("yyyyMMdd-HHmmss");
-        String dateString = df.format(new Date());
-
-        String logFilePath = String.format("%s/FIRST/odo4_%s.txt", Environment.getExternalStorageDirectory().getAbsolutePath(), dateString );
-        try {
-            FileWriter writer = new FileWriter(logFilePath);
-            fileWriter = new BufferedWriter(writer);
-        } catch (IOException e) {
-            throw new RuntimeException("Cannot write to file", e);
-        }
         // Set motor directions and modes
         initMotors();
         initIMU();
@@ -478,18 +411,75 @@ public class Odo_Test_4_log extends LinearOpMode {
     // Interpret user control inputs
     private void Controls() {
 
+        lkController.updateAll();
+
+        telemetry.addData("LOOP---", 0);
+
+        if (lkController.isPressed(1, LKController.GPbuttons.BACK)) {
+            telemetry.addData("BACK PRESSED", 0);
+        };
+
         // This blob is for manually entering desitnations
         if (gamepad2.a) {
             targetX = Math.round(xPos);
             targetY = Math.round(yPos);
             targetRot = Math.round(globalHeading);
         }
-        if (gamepad2.dpad_up) targetX++;
-        if (gamepad2.dpad_down) targetX--;
-        if (gamepad2.dpad_left) targetY++;
-        if (gamepad2.dpad_right) targetY--;
-        if (gamepad2.x) targetRot++;
-        if (gamepad2.y) targetRot--;
+        //if (gamepad2.dpad_up) targetX++;
+        //if (gamepad2.dpad_down) targetX--;
+        //if (gamepad2.dpad_left) targetY++;
+        //if (gamepad2.dpad_right) targetY--;
+        //if (gamepad2.x) targetRot++;
+        //if (gamepad2.y) targetRot--;
+
+        if (!gamepad2.dpad_up) {
+            last_up = false;
+        }
+        else if (!last_up) {
+            targetX = targetX + (gamepad2.back ? 1 : 11.75);
+            last_up = true;
+        }
+
+        if (!gamepad2.dpad_down) {
+            last_down = false;
+        }
+        else if (!last_down) {
+            targetX = targetX - (gamepad2.back ? 1 : 11.75);
+            last_down = true;
+        }
+
+        if (!gamepad2.dpad_left) {
+            last_left = false;
+        }
+        else if (!last_left) {
+            targetY = targetY + (gamepad2.back ? 1 : 11.75);
+            last_left = true;
+        }
+
+        if (!gamepad2.dpad_right) {
+            last_right = false;
+        }
+        else if (!last_right) {
+            targetY = targetY - (gamepad2.back ? 1 : 11.75);
+            last_right = true;
+        }
+
+        if (!gamepad2.x) {
+            last_x = false;
+        }
+        else if (!last_x) {
+            targetRot = targetRot + (gamepad2.back ? 2 : 45);
+            last_x = true;
+        }
+
+        if (!gamepad2.y) {
+            last_y = false;
+        }
+        else if (!last_y) {
+            targetRot = targetRot - (gamepad2.back ? 2 : 45);
+            last_y = true;
+        }
+
         if (gamepad2.start) navigate=1;
 
         // Cancels auto navigation
@@ -511,6 +501,8 @@ public class Odo_Test_4_log extends LinearOpMode {
             navStep=0;
             navTime.reset();
         }
+
+        // ???? if (gamepad1
 
         // Get speed and direction from left stick
         DriveSpeed = JavaUtil.minOfList(JavaUtil.createListWith(1, math_hypot(gamepad1.left_stick_x, gamepad1.left_stick_y)));
