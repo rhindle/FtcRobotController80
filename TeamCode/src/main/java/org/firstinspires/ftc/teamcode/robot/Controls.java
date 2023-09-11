@@ -11,7 +11,7 @@ public class Controls {
    Gamepad gamepad2;
    Robot robot;
    ButtonMgr buttonMgr;
-   Navigator2 navigator;
+   Navigator3 navigator;
    public double DriveSpeed, DriveAngle, Rotate;
 
    public final double tileSize = 23.5;  //in inches

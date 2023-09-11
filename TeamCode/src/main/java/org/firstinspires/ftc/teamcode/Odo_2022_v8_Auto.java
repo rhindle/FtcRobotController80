@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.robot.Auto;
 import org.firstinspires.ftc.teamcode.robot.ButtonMgr;
 import org.firstinspires.ftc.teamcode.robot.Navigator2;
+import org.firstinspires.ftc.teamcode.robot.Navigator3;
 import org.firstinspires.ftc.teamcode.robot.Robot;
 import org.firstinspires.ftc.teamcode.robot.Tools.Position;
 
@@ -28,7 +29,7 @@ public class Odo_2022_v8_Auto extends LinearOpMode {
     public Robot robot;
 //    public Localizer localizer;
 //    public Drivetrain drivetrain;
-    public Navigator2 navigator;
+    public Navigator3 navigator;
 //    public Controls controls;
     public Auto auto;
 

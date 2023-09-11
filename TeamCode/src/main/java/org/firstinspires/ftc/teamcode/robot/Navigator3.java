@@ -41,10 +41,14 @@ public class Navigator3 {
    private ElapsedTime navTime = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
    int lastStep = 0;
 
-   PIDCoefficients PIDmovement = new PIDCoefficients(0.083,0,0);
-   PIDCoefficients PIDrotate = new PIDCoefficients(0.0666,0,0);
+   PIDCoefficients PIDmovement = new PIDCoefficients(0.12,0,.035); //.083 .01
+   PIDCoefficients PIDrotate = new PIDCoefficients(0.03,0,0);  // was 1/15 = 0.0666
    PIDCoefficients PIDmovement_calculated = new PIDCoefficients(0,0,0);
    PIDCoefficients PIDrotate_calculated = new PIDCoefficients(0,0,0);
+   long PIDTimeCurrent;
+   long PIDTimeLast;
+   double errorDistLast;
+   double errorRotLast;
 
    Position testPosition = null;
 
@@ -234,17 +238,49 @@ public class Navigator3 {
       }
 
       navAngle = Math.toDegrees(Math.atan2(deltaY,deltaX));  // angle to xy destination (vector when combined with distance)
-      // linear proportional at 12", minimum 0.025
-      pDist = Math.max(Math.min(errorDist/12,1),0.025);
-      if (accurate==0) pDist = 1;  // don't bother with proportional when hitting transitional destinations
-      // linear proportional at 15°, minimum 0.025
-      pRot = Math.max(Math.min(Math.abs(errorRot)/15,1),0.025)*Math.signum(errorRot)*-1;
+ //     // linear proportional at 12", minimum 0.025
+ //     pDist = Math.max(Math.min(errorDist/12,1),0.025);
+ //     if (accurate==0) pDist = 1;  // don't bother with proportional when hitting transitional destinations
+ //     // linear proportional at 15°, minimum 0.025
+//      pRot = Math.max(Math.min(Math.abs(errorRot)/15,1),0.025)*Math.signum(errorRot)*-1;
 
       // 20230910 - Going to try for some proper PID here
-      //  Need to refactor all this later to make it less crappy
+      //  Need to refactor all this later to make it less crappy`
 
-      //PIDmovement_calculated.p =
+      PIDTimeCurrent = System.currentTimeMillis();
 
+      /*
+      i += k_i * (current_error * (current_time - previous_time))
+
+      if i > max_i:
+      i = max_i
+      elif i < -max_i:
+      i = -max_i
+      */
+
+      // Still need to reset I if we're going to use it.
+
+      PIDmovement_calculated.p = PIDmovement.p * errorDist;
+      PIDmovement_calculated.i += PIDmovement.i * errorDist * ((PIDTimeCurrent - PIDTimeLast) / 1000.0);
+      PIDmovement_calculated.i = Math.max(Math.min(PIDmovement_calculated.i,1),-1);
+      PIDmovement_calculated.d = PIDmovement.d * (errorDist - errorDistLast) / ((PIDTimeCurrent - PIDTimeLast) / 1000.0);
+
+      pDist =  PIDmovement_calculated.p +  PIDmovement_calculated.i +  PIDmovement_calculated.d;
+      pDist = Math.max(Math.min(pDist,1),0.025);
+      if (accurate==0) pDist = 1;  // don't bother with proportional when hitting transitional destinations
+
+      PIDrotate_calculated.p = PIDrotate.p * errorRot;
+      PIDrotate_calculated.i += PIDrotate.i * errorRot * ((PIDTimeCurrent - PIDTimeLast) / 1000.0);
+      PIDrotate_calculated.i = Math.max(Math.min(PIDrotate_calculated.i,1),-1);
+      PIDrotate_calculated.d = PIDrotate.d * (errorDist - errorRotLast) / ((PIDTimeCurrent - PIDTimeLast) / 1000.0);
+
+      pRot =  PIDrotate_calculated.p +  PIDrotate_calculated.i +  PIDrotate_calculated.d;
+      pRot = Math.max(Math.min(Math.abs(pRot),1),0.025)*Math.signum(pRot)*-1;
+      //pRot = Math.max(Math.min(Math.abs(errorRot)/15,1),0.025)*Math.signum(errorRot)*-1;
+
+      PIDTimeLast = PIDTimeCurrent;
+      errorDistLast = errorDist;
+      errorRotLast = errorRot;
 
       //special cases:  Ramp up the proportional for pole finding (find a better way to do this)
       if (isTrackingPole) {

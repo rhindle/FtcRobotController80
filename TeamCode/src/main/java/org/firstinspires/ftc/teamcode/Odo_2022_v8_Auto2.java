@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.robot.Auto;
 import org.firstinspires.ftc.teamcode.robot.ButtonMgr;
 import org.firstinspires.ftc.teamcode.robot.Navigator2;
+import org.firstinspires.ftc.teamcode.robot.Navigator3;
 import org.firstinspires.ftc.teamcode.robot.Robot;
 import org.firstinspires.ftc.teamcode.robot.Tools.Position;
 import org.firstinspires.ftc.teamcode.robot.Tools.Functions;
@@ -20,7 +21,7 @@ public class Odo_2022_v8_Auto2 extends LinearOpMode {
     private final double maxSpeed = 1;//0.2;
 
     public Robot robot;
-    public Navigator2 navigator;
+    public Navigator3 navigator;
     public Auto auto;
 
     boolean home = true;

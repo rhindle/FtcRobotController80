@@ -38,7 +38,7 @@ public class Robot {
     public ButtonMgr buttonMgr;
     public Localizer localizer;
     public Drivetrain drivetrain;
-    public Navigator2 navigator;
+    public Navigator3 navigator;
     public Sensors sensors;
 //    public Controls controls;
 
@@ -116,7 +116,7 @@ public class Robot {
         buttonMgr = new ButtonMgr(opMode);
         localizer = new Localizer(this);
         drivetrain = new Drivetrain(this);
-        navigator = new Navigator2(this);//, localizer, drivetrain);
+        navigator = new Navigator3(this);//, localizer, drivetrain);
         sensors = new Sensors(this);
 //        controls = new Controls(this);//buttonMgr, navigator);
     }

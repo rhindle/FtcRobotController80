@@ -9,7 +9,7 @@ public class Auto {
 
    Telemetry telemetry;
    Robot robot;
-   Navigator2 navigator;
+   Navigator3 navigator;
    public Controls controls;
 
    double tileSide = 23.5;

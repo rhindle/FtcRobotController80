@@ -12,6 +12,7 @@ import org.firstinspires.ftc.teamcode.robot.Drivetrain;
 import org.firstinspires.ftc.teamcode.robot.Localizer;
 import org.firstinspires.ftc.teamcode.robot.Navigator;
 import org.firstinspires.ftc.teamcode.robot.Navigator2;
+import org.firstinspires.ftc.teamcode.robot.Navigator3;
 import org.firstinspires.ftc.teamcode.robot.Robot;
 
 @TeleOp(name = "3Odo_2022_v8", group = "")
@@ -32,7 +33,7 @@ public class Odo_2022_v8 extends LinearOpMode {
     public Robot robot;
     public Localizer localizer;
     public Drivetrain drivetrain;
-    public Navigator2 navigator;
+    public Navigator3 navigator;
     public Controls controls;
 
     @Override

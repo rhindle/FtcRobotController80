@@ -11,7 +11,7 @@ public class LiftbotControls {
    Gamepad gamepad2;
    Robot robot;
    ButtonMgr buttonMgr;
-   Navigator2 navigator;
+   Navigator3 navigator;
    LiftbotLifter lifter;
    public double DriveSpeed, DriveAngle, Rotate, liftSpeed;
 
