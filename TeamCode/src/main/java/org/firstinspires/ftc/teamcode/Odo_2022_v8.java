@@ -54,6 +54,7 @@ public class Odo_2022_v8 extends LinearOpMode {
 
         elapsedTime = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
 
+        robot.useDriveEncoders = false;  // 20230910 - test mode
         robot.init();
         robot.sensors.init();
         drivetrain.init();

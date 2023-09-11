@@ -33,6 +33,7 @@ public class Robot {
     public boolean useODO = true;
     public boolean reverseDrive = false;
     public boolean useDistanceSensors = true;
+    public boolean useDriveEncoders = true;
 
     public ButtonMgr buttonMgr;
     public Localizer localizer;

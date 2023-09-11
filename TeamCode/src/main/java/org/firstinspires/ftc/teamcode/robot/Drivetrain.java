@@ -56,15 +56,17 @@ public class Drivetrain {
             motorRR.setDirection(DcMotorEx.Direction.REVERSE);
         }
 
-        motorLF.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-        motorLR.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-        motorRF.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-        motorRR.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        if (robot.useDriveEncoders) {
+            motorLF.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+            motorLR.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+            motorRF.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+            motorRR.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
 
-        motorLF.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-        motorLR.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-        motorRF.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-        motorRR.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+            motorLF.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+            motorLR.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+            motorRF.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+            motorRR.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        }
 
 //        motorLF.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
 //        motorLR.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
