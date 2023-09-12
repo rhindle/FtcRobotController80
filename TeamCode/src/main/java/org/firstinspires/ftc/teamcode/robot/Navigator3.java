@@ -41,14 +41,15 @@ public class Navigator3 {
    private ElapsedTime navTime = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
    int lastStep = 0;
 
-   PIDCoefficients PIDmovement = new PIDCoefficients(0.12,0,.035); //.083 .01
-   PIDCoefficients PIDrotate = new PIDCoefficients(0.03,0,0);  // was 1/15 = 0.0666
+   public PIDCoefficients PIDmovement = new PIDCoefficients(0.06,0.0012,0.006); //.12 0 .035
+   public PIDCoefficients PIDrotate = new PIDCoefficients(0.026,0.01,0.00025);  // .03 0 0
    PIDCoefficients PIDmovement_calculated = new PIDCoefficients(0,0,0);
    PIDCoefficients PIDrotate_calculated = new PIDCoefficients(0,0,0);
    long PIDTimeCurrent;
    long PIDTimeLast;
    double errorDistLast;
    double errorRotLast;
+   double navAngleLast;
 
    Position testPosition = null;
 
@@ -93,6 +94,9 @@ public class Navigator3 {
          drivetrain.setDrivePowers(v0, v1, v2, v3);
          return;
       }
+
+      telemetry.addData("PIDmov", "PID = %.4f, %.4f, %.4f", PIDmovement.p, PIDmovement.i, PIDmovement.d);
+      telemetry.addData("PIDrot", "PID = %.4f, %.4f, %.4f", PIDrotate.p, PIDrotate.i, PIDrotate.d);
 
       // State machine-ish.  Needs embetterment.  This will determine motor powers then set them
       if (navigate == 1) {
@@ -260,6 +264,8 @@ public class Navigator3 {
 
       // Still need to reset I if we're going to use it.
 
+      if (Math.abs(navAngle-navAngleLast)>45) PIDmovement_calculated.i = 0;  // test - zero the I if we pass through an inflection
+
       PIDmovement_calculated.p = PIDmovement.p * errorDist;
       PIDmovement_calculated.i += PIDmovement.i * errorDist * ((PIDTimeCurrent - PIDTimeLast) / 1000.0);
       PIDmovement_calculated.i = Math.max(Math.min(PIDmovement_calculated.i,1),-1);
@@ -281,6 +287,7 @@ public class Navigator3 {
       PIDTimeLast = PIDTimeCurrent;
       errorDistLast = errorDist;
       errorRotLast = errorRot;
+      navAngleLast = navAngle;
 
       //special cases:  Ramp up the proportional for pole finding (find a better way to do this)
       if (isTrackingPole) {
@@ -401,6 +408,7 @@ public class Navigator3 {
       targetX=0;
       targetY=0;
       targetRot=0;
+      resetPID();
    }
 
    public void cancelAutoNavigation() {
@@ -416,6 +424,7 @@ public class Navigator3 {
       targetX = Math.round(robotPosition.X);
       targetY = Math.round(robotPosition.Y);
       targetRot = Math.round(robotPosition.R);
+      resetPID();
    }
 
    public void setDeltaHeading() {
@@ -461,6 +470,7 @@ public class Navigator3 {
       targetY += Y;
       targetRot += R;
       storedHeading = targetRot;  //20230910 fix?
+      resetPID();
    }
 
    public boolean setTargetAbsolute(double X, double Y, double R) {
@@ -471,6 +481,7 @@ public class Navigator3 {
       targetX = X;
       targetY = Y;
       targetRot = Functions.normalizeAngle(R);
+      resetPID();
       return true;
    }
 
@@ -480,6 +491,7 @@ public class Navigator3 {
       targetRot += R;
       targetRot = Math.round(targetRot/45)*45;
       storedHeading = targetRot;
+      resetPID();
    }
 
    public void setTargetByDeltaRelative(double X, double Y, double R) {
@@ -491,6 +503,7 @@ public class Navigator3 {
       targetY = targetY + (X * Math.sin(Math.toRadians(rot)) + Y * Math.cos(Math.toRadians(rot)));
 //!!!!bug?      targetRot += R;
       targetRot += R;
+      resetPID();
    }
 
    public void setUserDriveSettings(double driveSpeed, double driveAngle, double rotate) {
@@ -525,6 +538,7 @@ public class Navigator3 {
 //      storedHeading += deltaHeading%45;
       storedHeading = Math.round(storedHeading/45)*45;
       targetRot = storedHeading;
+      resetPID();
    }
 
    public void handleRotate(double rotate) {
@@ -538,5 +552,10 @@ public class Navigator3 {
 //         storedHeading = localizer.returnGlobalHeading();
          storedHeading = robotPosition.R;
       }
+   }
+
+   public void resetPID() {
+      PIDmovement_calculated.i = 0;
+      PIDrotate_calculated.i = 0;
    }
 }

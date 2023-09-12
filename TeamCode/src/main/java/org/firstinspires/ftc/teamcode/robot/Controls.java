@@ -99,29 +99,57 @@ public class Controls {
       if (buttonMgr.wasTapped(1, ButtonMgr.Buttons.leftBUMPER))
          robot.sensors.readDistSensors();
 
-      // AutoDrive Testing
+      //20230911 - Added special chorded controls for PID tuning
 
-      // Start auto navigation
-      if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.START))
-         navigator.beginAutoDrive();
+      if (buttonMgr.isHeld(2, ButtonMgr.Buttons.rightBUMPER)) {
+         if (!buttonMgr.isPressed(2, ButtonMgr.Buttons.BACK)) {
+            if (buttonMgr.isPressed(2, ButtonMgr.Buttons.X)) navigator.PIDmovement.p -= 0.001;
+            if (buttonMgr.isPressed(2, ButtonMgr.Buttons.Y)) navigator.PIDmovement.i -= 0.00025;
+            if (buttonMgr.isPressed(2, ButtonMgr.Buttons.B)) navigator.PIDmovement.d -= 0.00025;
+         }
+         else {
+            if (buttonMgr.isPressed(2, ButtonMgr.Buttons.X)) navigator.PIDrotate.p -= 0.001;
+            if (buttonMgr.isPressed(2, ButtonMgr.Buttons.Y)) navigator.PIDrotate.i -= 0.00025;
+            if (buttonMgr.isPressed(2, ButtonMgr.Buttons.B)) navigator.PIDrotate.d -= 0.00025;
+         }
+      }
+      else if (buttonMgr.isHeld(2, ButtonMgr.Buttons.leftBUMPER)) {
+         if (!buttonMgr.isPressed(2, ButtonMgr.Buttons.BACK)) {
+            if (buttonMgr.isPressed(2, ButtonMgr.Buttons.X)) navigator.PIDmovement.p += 0.001;
+            if (buttonMgr.isPressed(2, ButtonMgr.Buttons.Y)) navigator.PIDmovement.i += 0.00025;
+            if (buttonMgr.isPressed(2, ButtonMgr.Buttons.B)) navigator.PIDmovement.d += 0.00025;
+         }
+         else {
+            if (buttonMgr.isPressed(2, ButtonMgr.Buttons.X)) navigator.PIDrotate.p += 0.001;
+            if (buttonMgr.isPressed(2, ButtonMgr.Buttons.Y)) navigator.PIDrotate.i += 0.0005;
+            if (buttonMgr.isPressed(2, ButtonMgr.Buttons.B)) navigator.PIDrotate.d += 0.001;
+         }
+      }
+      else {
 
-      // Set to home position
-      if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.rightBUMPER))
-         navigator.setTargetToZeroPosition();
+         // AutoDrive Testing
 
-      // Begin scripted navigation
-      if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.leftBUMPER))
-         navigator.beginScriptedNav();
+         // Start auto navigation
+         if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.START))
+            navigator.beginAutoDrive();
 
-      // Cancels auto navigation
-      if (buttonMgr.isPressed(2, ButtonMgr.Buttons.B))
-         navigator.cancelAutoNavigation();
+         // Set to home position
+         if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.rightBUMPER))
+            navigator.setTargetToZeroPosition();
 
-      // Reset target navigation to present position
-      if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.A))
-         navigator.setTargetToCurrentPosition();
+         // Begin scripted navigation
+         if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.leftBUMPER))
+            //navigator.beginScriptedNav();
 
-      // This blob is for manually entering destinations by adjusting X, Y, Rot
+         // Cancels auto navigation
+         if (buttonMgr.isPressed(2, ButtonMgr.Buttons.B))
+            navigator.cancelAutoNavigation();
+
+         // Reset target navigation to present position
+         if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.A))
+            navigator.setTargetToCurrentPosition();
+
+         // This blob is for manually entering destinations by adjusting X, Y, Rot
 //      if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.dpadUP))
 //         navigator.setTargetByDelta((gamepad2.back ? 1 : tileSize/2.0),0,0);
 //      if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.dpadDOWN))
@@ -130,19 +158,19 @@ public class Controls {
 //         navigator.setTargetByDelta(0, (gamepad2.back ? 1 : tileSize/2.0),0);
 //      if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.dpadRIGHT))
 //         navigator.setTargetByDelta(0, -(gamepad2.back ? 1 : tileSize/2.0),0);
-      if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.dpadLEFT))
-         navigator.setTargetByDelta((gamepad2.back ? 1 : tileSize/2.0),0,0);
-      if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.dpadRIGHT))
-         navigator.setTargetByDelta(-(gamepad2.back ? 1 : tileSize/2.0),0,0);
-      if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.dpadUP))
-         navigator.setTargetByDelta(0, -(gamepad2.back ? 1 : tileSize/2.0),0);  //signs on these temporarily reversed until method fixed
-      if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.dpadDOWN))
-         navigator.setTargetByDelta(0, (gamepad2.back ? 1 : tileSize/2.0),0);
+         if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.dpadLEFT))
+            navigator.setTargetByDelta((gamepad2.back ? 1 : tileSize / 2.0), 0, 0);
+         if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.dpadRIGHT))
+            navigator.setTargetByDelta(-(gamepad2.back ? 1 : tileSize / 2.0), 0, 0);
+         if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.dpadUP))
+            navigator.setTargetByDelta(0, -(gamepad2.back ? 1 : tileSize / 2.0), 0);  //signs on these temporarily reversed until method fixed
+         if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.dpadDOWN))
+            navigator.setTargetByDelta(0, (gamepad2.back ? 1 : tileSize / 2.0), 0);
 
-      if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.X))
-         navigator.setTargetByDelta(0,0,(gamepad2.back ? 2 : 45));
-      if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.Y))
-         navigator.setTargetByDelta(0,0,-(gamepad2.back ? 2 : 45));
-
+         if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.X))
+            navigator.setTargetByDelta(0, 0, (gamepad2.back ? 2 : 45));
+         if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.Y))
+            navigator.setTargetByDelta(0, 0, -(gamepad2.back ? 2 : 45));
+      }
    }
 }
