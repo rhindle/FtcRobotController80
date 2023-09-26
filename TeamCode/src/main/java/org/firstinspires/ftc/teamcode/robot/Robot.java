@@ -19,6 +19,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+import org.firstinspires.ftc.teamcode.robot.Tools.QwiicLEDStick;
 
 import java.util.List;
 
@@ -69,6 +70,8 @@ public class Robot {
 //    public DistanceSensor sensor2MLeft = null;
 //    public DistanceSensor sensor2MMiddle = null;
 //    public DistanceSensor sensor2MRight = null;
+
+    public QwiicLEDStick qled = null;
 
     public DigitalChannel   digital0 = null;
     public DigitalChannel   digital1 = null;
@@ -278,5 +281,6 @@ public class Robot {
 //        sensor2MLeft = hardwareMap.get(DistanceSensor.class, "2MdistL");
 //        sensor2MMiddle = hardwareMap.get(DistanceSensor.class, "2MdistM");
 //        sensor2MRight = hardwareMap.get(DistanceSensor.class, "2MdistR");
+        qled = hardwareMap.get(QwiicLEDStick.class, "led");
     }
 }

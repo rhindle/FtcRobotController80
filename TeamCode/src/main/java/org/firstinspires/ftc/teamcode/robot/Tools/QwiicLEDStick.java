@@ -10,6 +10,9 @@ import com.qualcomm.robotcore.hardware.I2cWaitControl;
 import com.qualcomm.robotcore.hardware.configuration.annotations.DeviceProperties;
 import com.qualcomm.robotcore.hardware.configuration.annotations.I2cDeviceType;
 
+import static android.os.SystemClock.sleep;
+
+
 @I2cDeviceType()
 @DeviceProperties(name = "QWIIC LED Stick", description = "Sparkfun QWIIC LED Stick", xmlTag = "QWIIC_LED_STICK")
 public class QwiicLEDStick extends I2cDeviceSynchDevice<I2cDeviceSynchSimple> {
@@ -96,7 +99,9 @@ public class QwiicLEDStick extends I2cDeviceSynchDevice<I2cDeviceSynchSimple> {
             blueArray[i] = Color.blue(colors[i + offset]);
         }
         sendSegment(Commands.WRITE_RED_ARRAY, redArray, offset, length);
+        sleep(3);
         sendSegment(Commands.WRITE_GREEN_ARRAY, greenArray, offset, length);
+        sleep(3);
         sendSegment(Commands.WRITE_BLUE_ARRAY, blueArray, offset, length);
     }
 
