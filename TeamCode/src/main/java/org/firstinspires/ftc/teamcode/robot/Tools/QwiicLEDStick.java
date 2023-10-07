@@ -26,12 +26,65 @@ public class QwiicLEDStick extends I2cDeviceSynchDevice<I2cDeviceSynchSimple> {
         WRITE_BLUE_ARRAY(0x75),
         WRITE_SINGLE_LED_BRIGHTNESS(0x76),
         WRITE_ALL_LED_BRIGHTNESS(0x77),
-        WRITE_ALL_LED_OFF(0x78);
+        WRITE_ALL_LED_OFF(0x78),
+        CHANGE_DEFAULT_BRIGHTNESS (0x80),
+        //CHANGE_LED_TYPE (0x81),
+        CHANGE_MIRROR_MODE (0x82),
+        WRITE_COLOR_LENGTH (0x90),
+        WRITE_COLOR_LENGTH_WITH_BLANK (0x91),
+        WRITE_COLOR_LENGTH2 (0x92),
+        WRITE_COLOR_LENGTH2_WITH_BLANK (0x93);
         int bVal;
 
         Commands(int bVal) {
             this.bVal = bVal;
         }
+    }
+
+
+    /** LK Extended Functions */
+    public void setColorGroup(int startLED, int numLED, @ColorInt int color) {
+        setColorGroup(startLED, numLED, color, false);
+    }
+    public void setColorGroup(int startLED, int numLED, @ColorInt int color, boolean blankFirst ) {
+        byte[] data = new byte[5];
+        data[0] = (byte) startLED;
+        data[1] = (byte) numLED;
+        data[2] = (byte) Color.red(color);
+        data[3] = (byte) Color.green(color);
+        data[4] = (byte) Color.blue(color);
+        if (!blankFirst) writeI2C(Commands.WRITE_COLOR_LENGTH, data);
+        else writeI2C(Commands.WRITE_COLOR_LENGTH_WITH_BLANK, data);
+    }
+    public void setColorGroupX2(int startLED, int numLED, @ColorInt int color, int startLED2, int numLED2, @ColorInt int color2 ) {
+        setColorGroupX2(startLED, numLED, color, startLED2, numLED2, color2,false);
+    }
+    public void setColorGroupX2(int startLED, int numLED, @ColorInt int color, int startLED2, int numLED2, @ColorInt int color2, boolean blankFirst ) {
+        byte[] data = new byte[10];
+        data[0] = (byte) startLED;
+        data[1] = (byte) numLED;
+        data[2] = (byte) Color.red(color);
+        data[3] = (byte) Color.green(color);
+        data[4] = (byte) Color.blue(color);
+        data[5] = (byte) startLED2;
+        data[6] = (byte) numLED2;
+        data[7] = (byte) Color.red(color2);
+        data[8] = (byte) Color.green(color2);
+        data[9] = (byte) Color.blue(color2);
+        if (!blankFirst) writeI2C(Commands.WRITE_COLOR_LENGTH2, data);
+        else writeI2C(Commands.WRITE_COLOR_LENGTH2_WITH_BLANK, data);
+    }
+    public void setDefaultBrightness(int brightness) {  // this writes to EEPROM
+        if (brightness < 1 || brightness > 31) return;
+        byte[] data = new byte[1];
+        data[0] = (byte) brightness;
+        writeI2C(Commands.CHANGE_DEFAULT_BRIGHTNESS, data);
+    }
+    public void setMirrorMode(int mode) {  // this writes to EEPROM
+        if (mode < 0 || mode > 2) return;
+        byte[] data = new byte[1];
+        data[0] = (byte) mode;
+        writeI2C(Commands.CHANGE_MIRROR_MODE, data);
     }
 
     /**
