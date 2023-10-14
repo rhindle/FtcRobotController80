@@ -290,7 +290,7 @@ public class ZZ_TestBot_LED extends LinearOpMode {
                     robot.qled.setColorGroupX2(2,2,Color.rgb(0, 127, 0),7,2,Color.rgb(0, 127, 0));  //green
                 }
             }*/
-            else {
+            /*else {
                 if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.X)) {
                     setLedColorArray(Color.rgb(120, 0, 90), ledmode);  //purple
                     ledmode++;
@@ -306,6 +306,21 @@ public class ZZ_TestBot_LED extends LinearOpMode {
                 } else if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.BACK)) {
                     setLedColorArray(0, 0);
                     ledmode = 1;
+                }
+            } */
+            else {
+                if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.X)) {
+                    pushLedColorArray(Color.rgb(120, 0, 90));  //purple
+                } else if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.Y)) {
+                    pushLedColorArray(Color.rgb(127, 50, 0));  //yellow
+                } else if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.B)) {
+                    pushLedColorArray(Color.rgb(48, 45, 36));  //white
+                } else if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.A)) {
+                    pushLedColorArray(Color.rgb(0, 127, 0));  //green
+                } else if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.BACK)) {
+                    pushLedColorArray(0, false);
+                    pushLedColorArray(0, false);
+                    robot.qled.turnAllOff();
                 }
             }
 
@@ -360,6 +375,18 @@ public class ZZ_TestBot_LED extends LinearOpMode {
             loopElapsedTime.reset();
             telemetry.update();
         }
+    }
+
+    public void pushLedColorArray (int c, boolean update) {
+        //push the colors from the first half onto the last half, add new colors at start
+        for (int i=0; i<4; i++) {
+            ledcolors[10-1-i] = ledcolors[i];
+            ledcolors[i] = c;
+        }
+        if (update) robot.qled.setColors(ledcolors);
+    }
+    public void pushLedColorArray (int c) {
+        pushLedColorArray(c, true);
     }
 
     public void setLedColorArray (int c, int mode) {
