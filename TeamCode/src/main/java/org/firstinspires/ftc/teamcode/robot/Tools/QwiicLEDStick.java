@@ -33,14 +33,15 @@ public class QwiicLEDStick extends I2cDeviceSynchDevice<I2cDeviceSynchSimple> {
         WRITE_COLOR_LENGTH (0x90),
         WRITE_COLOR_LENGTH_WITH_BLANK (0x91),
         WRITE_COLOR_LENGTH2 (0x92),
-        WRITE_COLOR_LENGTH2_WITH_BLANK (0x93);
+        WRITE_COLOR_LENGTH2_WITH_BLANK (0x93),
+        CONTROL_ANIMATION (0xA0),
+        FORCE_WDT_REBOOT (0xB0);
         int bVal;
 
         Commands(int bVal) {
             this.bVal = bVal;
         }
     }
-
 
     /** LK Extended Functions */
     public void setColorGroup(int startLED, int numLED, @ColorInt int color) {
@@ -85,6 +86,17 @@ public class QwiicLEDStick extends I2cDeviceSynchDevice<I2cDeviceSynchSimple> {
         byte[] data = new byte[1];
         data[0] = (byte) mode;
         writeI2C(Commands.CHANGE_MIRROR_MODE, data);
+    }
+    public void setAnimationOnOff(int mode) {
+        if (mode < 0 || mode > 1) return;
+        byte[] data = new byte[1];
+        data[0] = (byte) mode;
+        writeI2C(Commands.CONTROL_ANIMATION, data);
+    }
+    public void forceReboot() {
+        byte[] data = new byte[1];
+        data[0] = (byte) 0;
+        writeI2C(Commands.FORCE_WDT_REBOOT, data);
     }
 
     /**
@@ -152,9 +164,9 @@ public class QwiicLEDStick extends I2cDeviceSynchDevice<I2cDeviceSynchSimple> {
             blueArray[i] = Color.blue(colors[i + offset]);
         }
         sendSegment(Commands.WRITE_RED_ARRAY, redArray, offset, length);
-        sleep(3);
+        //sleep(3);
         sendSegment(Commands.WRITE_GREEN_ARRAY, greenArray, offset, length);
-        sleep(3);
+        //sleep(3);
         sendSegment(Commands.WRITE_BLUE_ARRAY, blueArray, offset, length);
     }
 

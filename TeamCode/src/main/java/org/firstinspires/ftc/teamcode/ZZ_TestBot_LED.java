@@ -238,28 +238,34 @@ public class ZZ_TestBot_LED extends LinearOpMode {
                 robot.qled.setMirrorMode(1);
             } else if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.dpadUP)) {
                 robot.qled.setMirrorMode(2);
+            } else if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.dpadRIGHT)) {
+                robot.qled.setAnimationOnOff(1);
             }
 
             if (buttonMgr.isPressed(2, ButtonMgr.Buttons.leftBUMPER)) {
                 if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.X)) {
-                    robot.qled.setColorGroup(0,2,Color.rgb(80, 0, 110));  //purple
+                    robot.qled.setColorGroup(0,2,Color.rgb(120, 0, 90));  //purple
                 } else if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.Y)) {
                     robot.qled.setColorGroup(0,2,Color.rgb(127, 50, 0));  //yellow
                 } else if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.B)) {
-                    robot.qled.setColorGroup(0,2,Color.rgb(64, 60, 48));  //white
+                    robot.qled.setColorGroup(0,2,Color.rgb(48, 45, 36));  //white
                 } else if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.A)) {
-                    robot.qled.setColorGroup(0,2,Color.rgb(0, 127, 0));  //green
+                    robot.qled.setColorGroup(0, 2, Color.rgb(0, 127, 0));  //green
+                } else if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.BACK)) {
+                    robot.qled.forceReboot();
                 }
             }
             else if (buttonMgr.isPressed(2, ButtonMgr.Buttons.rightBUMPER)) {
                 if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.X)) {
-                    robot.qled.setColorGroup(2,2,Color.rgb(80, 0, 110));  //purple
+                    robot.qled.setColorGroup(2,2,Color.rgb(120, 0, 90));  //purple
                 } else if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.Y)) {
                     robot.qled.setColorGroup(2,2,Color.rgb(127, 50, 0));  //yellow
                 } else if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.B)) {
-                    robot.qled.setColorGroup(2,2,Color.rgb(64, 60, 48));  //white
+                    robot.qled.setColorGroup(2,2,Color.rgb(48, 45, 36));  //white
                 } else if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.A)) {
                     robot.qled.setColorGroup(2,2,Color.rgb(0, 127, 0));  //green
+                } else if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.BACK)) {
+                    robot.qled.forceReboot();
                 }
             }
 /*            if (buttonMgr.isPressed(2, ButtonMgr.Buttons.leftBUMPER)) {
@@ -286,13 +292,13 @@ public class ZZ_TestBot_LED extends LinearOpMode {
             }*/
             else {
                 if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.X)) {
-                    setLedColorArray(Color.rgb(80, 0, 110), ledmode);  //purple
+                    setLedColorArray(Color.rgb(120, 0, 90), ledmode);  //purple
                     ledmode++;
                 } else if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.Y)) {
                     setLedColorArray(Color.rgb(127, 50, 0), ledmode);  //yellow
                     ledmode++;
                 } else if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.B)) {
-                    setLedColorArray(Color.rgb(64, 60, 48), ledmode);  //white
+                    setLedColorArray(Color.rgb(48, 45, 36), ledmode);  //white
                     ledmode++;
                 } else if (buttonMgr.wasTapped(2, ButtonMgr.Buttons.A)) {
                     setLedColorArray(Color.rgb(0, 127, 0), ledmode);  //green
