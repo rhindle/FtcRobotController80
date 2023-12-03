@@ -92,8 +92,10 @@ public class ZZ_TestBot_LED extends LinearOpMode {
         // to amplify/attentuate the measured values.
         final double SCALE_FACTOR = 255;
 
+        robot.qled.changeLength(20);
         robot.qled.setBrightness(1);
         robot.qled.setDefaultBrightness(1);
+
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
