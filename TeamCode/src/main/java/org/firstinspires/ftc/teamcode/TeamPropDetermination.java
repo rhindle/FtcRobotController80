@@ -176,7 +176,7 @@ public class TeamPropDetermination extends LinearOpMode
 
         // Volatile since accessed by OpMode thread w/o synchronization
         private volatile TempPropPosition position = TempPropPosition.LEFT;
-        private TempPropPosition defaultPosition = position;
+        private TempPropPosition cantSeePosition = position;
 
         /*
          * This function takes the RGB frame, converts to YCrCb,
@@ -344,7 +344,7 @@ public class TeamPropDetermination extends LinearOpMode
             //int max = Math.max(maxOneTwo, avg3);
             int max = Math.max(Math.max(avg1, avg2), avg3);
             int avgMin = (int)((avg1+avg2+avg3-max)/2.0);
-            if (max < avgMin*2) max = (defaultPosition== TempPropPosition.LEFT) ? avg1 : avg3;
+            if (max < avgMin*2) max = (cantSeePosition == TempPropPosition.LEFT) ? avg1 : avg3;
 
             Imgproc.putText (
                     input,                          // Matrix obj of the image
