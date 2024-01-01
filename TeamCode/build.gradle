@@ -30,5 +30,6 @@ dependencies {
     implementation files('lib/ftc265-3.0.0-pre.5.aar')    //lk
     implementation 'com.acmerobotics.dashboard:dashboard:0.4.6'        //lk
     implementation 'com.acmerobotics.roadrunner:core:0.5.3'
+    implementation 'org.openftc:easyopencv:1.6.2'
     //implementation 'com.spartronics4915.lib:ftc265:2.1.9'
 }
