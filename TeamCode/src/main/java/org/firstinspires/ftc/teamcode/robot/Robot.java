@@ -35,6 +35,7 @@ public class Robot {
     public boolean reverseDrive = false;
     public boolean useDistanceSensors = true;
     public boolean useDriveEncoders = true;
+    public boolean disableIMUupdate = false;
 
     public ButtonMgr buttonMgr;
     public Localizer localizer;
@@ -142,7 +143,7 @@ public class Robot {
         }
         // Read IMU - once per cycle!
         //angles = sensorIMU.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
-        updateImuHeading();
+        if (!disableIMUupdate) updateImuHeading();
 //        updateDistanceSensors();
     }
 
