@@ -157,8 +157,43 @@ public class Omdometry {
 
       cumulativeDistance += YMove;
 
+      /* ~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+      // the change in pose of the robot since last loop
+      Vector3 rawDeltaPose = new Vector3(XMove, YMove, angle);
+      telemetry.addData ("_rawDeltaPose______", rawDeltaPose.toString());
+      // the robot offset, stored in settings
+      //Vector3 robotOffset = getSettings().robotOffset;
+      Vector3 robotOffset = new Vector3 (-0.10,2.33,0);
+      telemetry.addData ("_robotOffset________", robotOffset.toString());
+      // the inverse of the robot offset, for de-transforming the field
+      Vector3 invRobotOffset = new Vector3 (-robotOffset.X, -robotOffset.Y, 0);
+      telemetry.addData ("_invRobotOffset_____", invRobotOffset.toString());
+
+      // Step 1. Get the absolute robot field position from the parent class
+      /* This was already done... */
+      //Vector3 pos = parent.getCurrentPosition();
+      //double imuAng = parent.getImuAngle();
+
+      // Step 2. De-transform the robot field position by the robot offset
+      Vector3 detransformPosition = VectorMath.translateAsVector2(pos, invRobotOffset.X, invRobotOffset.Y);
+      telemetry.addData ("_pos________________", pos.toString());
+      telemetry.addData ("_detransformPosition", detransformPosition.toString());
+
+      // Step 3. Add the X & Y changes, transformed by the offset imuAngle
+      Vector3 modifiedPosition = VectorMath.translateAsVector2(detransformPosition.withZ(imuAng), rawDeltaPose.X, rawDeltaPose.Y);
+      telemetry.addData ("_modifiedPosition___", modifiedPosition.toString());
+
+      // Step 4. Re-transform the position by the robot offset
+      Vector3 finalPosition = VectorMath.translateAsVector2(modifiedPosition, robotOffset.X, robotOffset.Y);
+      telemetry.addData ("_finalPosition_______", finalPosition.toString());
+
+      // Step 5. Feed that position into the PositionTicket
+      //parent.addPositionTicket(Odometry.class, new PositionTicket(finalPosition, new Vector2(XMove, YMove));
+      currentPosition = finalPosition;
+      /* ~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+
 //      parent.addPositionTicket(Odometry.class, new PositionTicket(VectorMath.translateAsVector2(pos.withZ(angle), XMove, YMove), new Vector2(XMove, YMove)));
-      currentPosition = VectorMath.translateAsVector2(pos.withZ(angle), XMove, YMove);
+      //currentPosition = VectorMath.translateAsVector2(pos.withZ(angle), XMove, YMove);
 //      interimPosition = VectorMath.translateAsVector2(pos.withZ(avgAngle), XMove, YMove);  // LK new
 //      currentPosition = interimPosition.withZ(angle);   // LK new
 
@@ -194,6 +229,7 @@ public class Omdometry {
 //      lastImuAngle = parent.getImuAngle();
       odoAngle = currentPosition.Z;
       lastImuAngle = getImuAngle();
+      cumulativeOdoAngle = lastImuAngle;  //LK
    }
 
 //   @Override

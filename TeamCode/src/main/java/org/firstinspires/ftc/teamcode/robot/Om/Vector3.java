@@ -109,7 +109,8 @@ public class Vector3 {
 	}
 
 	public String toString(int decimals){
-		return "Vector3{X=" + String.format("%."+ decimals +"f", X) + ", Y=" + String.format("%."+ decimals +"f", Y) + ", Z=" + String.format("%."+ decimals +"f", Z) + "}";
+//		return "Vector3{X=" + String.format("%."+ decimals +"f", X) + ", Y=" + String.format("%."+ decimals +"f", Y) + ", Z=" + String.format("%."+ decimals +"f", Z) + "}";
+		return "X=" + String.format("%."+ decimals +"f", X) + ", Y=" + String.format("%."+ decimals +"f", Y) + ", Z=" + String.format("%."+ decimals +"f", Z) + "";
 	}
 
 	@Override
